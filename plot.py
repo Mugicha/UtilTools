@@ -7,5 +7,5 @@ class Plot():
 
     def corr_map(self, _df: pd.DataFrame):
         plt.figure(figsize=(8, 6))  # heat map size
-        hmap = sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5)
+        sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5)
         plt.savefig('output.png')
