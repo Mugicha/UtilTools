@@ -11,6 +11,12 @@ class Plot():
         plt.savefig('corr_map.png')
 
     def scatter_with_histogram(self, _df: pd.DataFrame, dim_reduction=False):
+        """
+        ヒストグラム付き散布図の画像を保存する機能。
+        :param _df: 散布図の基となるDataFrame.
+        :param dim_reduction: 次元削減するかどうか(default=False)
+        :return: None.
+        """
         plt.figure(figsize=(8, 6))
         if dim_reduction:
             from UtilTools.data_mining import DataManipulation
@@ -23,6 +29,11 @@ class Plot():
         plt.savefig('scatter_with_histogram.png')
 
     def pair_plot(self, _df: pd.DataFrame):
+        """
+        seabornのPariplot画像を保存する機能。
+        :param _df: pairplotしたいDataFrame
+        :return: None.
+        """
         plt.figure(figsize=(8, 6))
         sns.pairplot(_df)
         plt.savefig('pair_plot.png')

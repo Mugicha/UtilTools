@@ -1,5 +1,6 @@
 from sklearn.decomposition import PCA
 import pandas as pd
+import numpy as np
 
 
 class DataManipulation():
@@ -14,7 +15,7 @@ class DataManipulation():
         """
         pca = PCA(n_components=_dim)  # type: PCA
         pca.fit(_df.values)
-        transformed = pca.fit_transform(_df.values)  # TODO write return type.
+        transformed = pca.fit_transform(_df.values)  # type: np.ndarray
         if _return_with_model:
             return transformed, pca
         else:
