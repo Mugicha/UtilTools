@@ -5,7 +5,7 @@ class FileOperation():
 
     def csv_to_df(self, _path: str):
         """
-        import csv and return the data as Dataframe.
+        import csv and return the data as DataFrame.
         :param _path: csv path
         :return: DataFrame
         """
@@ -22,4 +22,4 @@ class FileOperation():
         with open(_path) as f:
             for line in f:
                 _list.append(line.replace('\n', ''))
-        return _list
+        return _list  # type: list
