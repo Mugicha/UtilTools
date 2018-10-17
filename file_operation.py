@@ -25,6 +25,43 @@ class FileOperation():
             print('Cannot import csv file. [' + _path + ']')
             exit(1)
 
+    def excel_to_df(self, _input_file: str):
+        """
+        Excel の読み込み
+        :param _input_file: 入力するExcelのファイルパス
+        :return: Excelデータを格納したDataFrame(読み込めない場合はNone)
+        """
+        try:
+            entire_row_data = pd.ExcelFile(_input_file, encoding='utf8')
+        except:
+            return None
+        sheet_names = entire_row_data.sheet_names
+        if len(sheet_names) == 1:  # シートが1つの時
+            row_data = entire_row_data.parse(sheet_names[0])
+        elif len(sheet_names) > 1:  # 複数のシートが存在する場合
+            print('シートが複数存在します。読み込むシートの番号を下記から選択してください。')
+            for sht_num in range(len(sheet_names)):
+                print(str(sht_num) + ' : ' + sheet_names[sht_num])
+            input_sht_num = input('>>> ')
+            row_data = entire_row_data.parse(sheet_names[int(input_sht_num)])
+        else:
+            return None
+        return row_data
+
+    def df_to_excel(self, _output_file: str, _output_df: pd.DataFrame, _sheet_name='exported'):
+        """
+        Excelの書き出し
+        :param _output_file: 出力するExcelのファイルパス
+        :param _output_df: 出力するデータ(DataFrame型)
+        :param _sheet_name: exportしたexcelのシート名
+        :return: 終了コード（0:正常, 1:異常）
+        """
+        try:
+            _output_df.to_excel(_output_file, sheet_name=_sheet_name, index=False)
+        except:
+            print('Cannot export to excel.')
+            exit(1)
+
     def txt_to_ary(self, _path: str):
         """
         対象のファイルを1行ごとに配列に格納してreturnする。
