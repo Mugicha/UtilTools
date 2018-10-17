@@ -14,11 +14,11 @@ class FileOperation():
         """
         if date_convert:
             my_parser = lambda date: pd.datetime.strptime(date, date_format)
-            try:
-                return pd.read_csv(_path, parse_dates=[date_data_loc], date_parser=my_parser)
-            except:
-                print('Cannot import csv file or convert time format.')
-                exit(1)
+            #try:
+            return pd.read_csv(_path, parse_dates=[date_data_loc], date_parser=my_parser)
+            #except:
+            #    print('Cannot import csv file or convert time format.')
+            #    exit(1)
         try:
             return pd.read_csv(_path)
         except:
