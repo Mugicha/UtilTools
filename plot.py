@@ -6,6 +6,11 @@ import os
 
 class Plot():
 
+    def pure_2d_plot(self, _df: pd.DataFrame, _x: int, _y: int):
+        plt.figure(figsize=(8, 6))  # plot size
+        plt.plot(_df.iloc[:, _x].values, _df[:, _y].values)
+        return plt
+
     def corr_map(self, _df: pd.DataFrame, _path='./'):
         """
         各変数の相関係数のヒートマップ画像を保存する機能。
