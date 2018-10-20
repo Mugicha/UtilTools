@@ -7,6 +7,13 @@ import os
 class Plot():
 
     def pure_2d_plot(self, _df: pd.DataFrame, _x: int, _y: int):
+        """
+        DataFrame内の2列を使って二次元プロットを行う機能。
+        :param _df: 使用するDataFrame
+        :param _x: x軸のラベル番号
+        :param _y: y軸のラベル番号
+        :return: matplotlib.pyplotクラス
+        """
         plt.figure(figsize=(8, 6))  # plot size
         plt.plot(_df.iloc[:, _x].values, _df.iloc[:, _y].values)
         return plt
