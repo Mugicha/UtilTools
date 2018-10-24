@@ -88,4 +88,5 @@ class FileOperation():
         """
         with open(_path, _mode) as f:
             f.write('\n'.join(_list))
+            f.write('\n')
         f.close()
