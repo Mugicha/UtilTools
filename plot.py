@@ -60,7 +60,7 @@ class Plot():
         sns.pairplot(_df)
         plt.savefig(os.path.join(_path, 'pair_plot.png'))
 
-    def scatter_emphasis(self, _df: pd.DataFrame, _x: int, _y: int, _c: int, _path='./'):
+    def scatter_emphasis(self, _df: pd.DataFrame, _x: int, _y: int, _c: int, _path='./', _s=2):
         """
         ラベルによって色を変えて散布図を表示する機能。
         :param _df: 表示させたいDataFrame
@@ -68,11 +68,12 @@ class Plot():
         :param _y: y軸の要素
         :param _c: 色を変えるラベルとなる要素
         :param _path: 保存するフォルダのパス
+        :param _s: size of point.
         :return: None.
         """
         colors = ListedColormap(['red', 'blue'])
         plt.xlabel(_df.columns.values[_x])
         plt.ylabel(_df.columns.values[_y])
         plt.title(_df.columns.values[_c])
-        plt.scatter(_df.iloc[:, _x], _df.iloc[:, _y], c=_df.iloc[:, _c], cmap=colors, s=2)
+        plt.scatter(_df.iloc[:, _x], _df.iloc[:, _y], c=_df.iloc[:, _c], cmap=colors, s=_s)
         plt.savefig(os.path.join(_path, 'scatter_emphasis.png'))
