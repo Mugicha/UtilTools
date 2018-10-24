@@ -25,6 +25,9 @@ class FileOperation():
             print('Cannot import csv file. [' + _path + ']')
             exit(1)
 
+    def df_to_csv(self, _df: pd.DataFrame, _path='./'):
+        _df.to_csv(_path)
+
     def excel_to_df(self, _input_file: str):
         """
         Excel の読み込み
