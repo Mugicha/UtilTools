@@ -77,3 +77,15 @@ class FileOperation():
             for line in f:
                 _list.append(line.replace('\n', ''))
         return _list  # type: list
+
+    def ary_to_txt(self, _list: list, _path: str, _mode: str):
+        """
+        list型変数を要素ごとにテキストに書き出す。
+        :param _list: 書き出したい配列LIST
+        :param _path: 書き出し先
+        :param _mode: 書き込みモード（w:書き出し, x:新規作成＆書き込み用に開く, a:末尾に追記）
+        :return:
+        """
+        with open(_path, _mode) as f:
+            f.write('\n'.join(_list))
+        f.close()
