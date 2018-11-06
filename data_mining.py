@@ -40,4 +40,4 @@ class DataManipulation():
         :param _df: NAが含まれる行を削除したいデータ(DataFrame形式)
         :return: NAが削除された後のDataFrame
         """
-        return _df.dropna(how='all')
+        return _df.dropna(how='any')
