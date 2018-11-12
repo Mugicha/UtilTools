@@ -121,4 +121,5 @@ class Plot():
         plt.ylabel(_y)
         plt.tight_layout()
         plt.xticks(rotation=90)
+        plt.tight_layout()
         plt.savefig(os.path.join(_path, 'pcolormesh.png'))
