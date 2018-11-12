@@ -47,6 +47,8 @@ class Plot():
         plt.figure(figsize=(8, 6))  # heat map size
         sns.set(font_scale=0.6)
         sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5, annot_kws={"size": 5})
+        plt.yticks(rotation=0)
+        plt.xticks(rotation=90)
         plt.savefig(os.path.join(_path, 'corr_map.png'))
 
     def scatter_with_histogram(self, _df: pd.DataFrame, dim_reduction=False, _path='./'):
@@ -118,4 +120,5 @@ class Plot():
         plt.xlabel(_x)
         plt.ylabel(_y)
         plt.tight_layout()
+        plt.xticks(rotation=90)
         plt.savefig(os.path.join(_path, 'pcolormesh.png'))
