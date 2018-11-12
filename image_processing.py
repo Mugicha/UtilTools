@@ -40,3 +40,22 @@ class Image_processing():
         # cv2.waitKey(0)
         output_img = ''.join(_path.split('/')[-1].split('.')[0:-1]) + '_' + str(_gamma) + '.png'
         cv2.imwrite(output_img, img_gamma)
+
+    def extract_img(self, _h: int, _w: int, _path: str):
+        """
+        画像を定形に細切れにする機能。
+        :param _h: 細切れにする高さ。
+        :param _w: 細切れにする幅。
+        :param _path: 細切れにする画像のパス。
+        :return:
+        """
+        img = cv2.imread(_path, 0)
+        if img.shape[0] % _h != 0 or img.shape[1] % _w != 0:
+            print('[Warn] Image cannot be divided by _w, or _h.')
+            exit(1)
+        for ew in range(0, len(img[1]), _w):
+            for eh in range(0, len(img[0]), _h):
+                extracted_patch = img[eh:eh + _h - 1, ew:ew + _w - 1]
+                cv2.imwrite(
+                    './' + _path.split('/')[-1].split('.')[0] + '_extpatch_h' + str(eh) + '_w' + str(ew) + '.png',
+                    extracted_patch)
