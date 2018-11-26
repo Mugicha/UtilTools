@@ -162,5 +162,8 @@ class Plot():
         """
         import statsmodels.api as sm
         fig, ax = plt.subplots(nrows=1, figsize=(16, 12))
+        plt.xlabel('Lag')
+        plt.ylabel('Correlation coefficient')
         sm.graphics.tsa.plot_acf(_df.iloc[:, _col], lags=_lag, ax=ax)
+        plt.tight_layout()
         plt.savefig(os.path.join(_path, _file))
