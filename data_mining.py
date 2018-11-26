@@ -22,18 +22,24 @@ class DataManipulation():
         else:
             return transformed
 
-    def fill_na(self, _df: pd.DataFrame):
+    def fill_na(self, _df: pd.DataFrame, _typ: int):
         """
         fill na with previous value.
         :param _df: NAを埋めたいData Frame.
+        :param _typ: NAの埋め方（0: 前行値で補完、1: 線形補完）
         :return:  NAを前行の値で埋めたDataFrame.
         """
         _df_isnull = _df.isnull()
-        for i in range(len(_df)):
-            for j in range(len(_df.index)):
-                if _df_isnull.iat[j, i]:
-                    _df.replace(_df.iat[j, i], _df.iat[j - 1, i], inplace=True)
-        return _df
+        # 前行補完
+        if _typ == 0:
+            for i in range(len(_df)):
+                for j in range(len(_df.index)):
+                    if _df_isnull.iat[j, i]:
+                        _df.replace(_df.iat[j, i], _df.iat[j - 1, i], inplace=True)
+            return _df
+        # 線形補完
+        elif _typ == 1:
+            return _df.interpolate()
 
     def drop_na(self, _df: pd.DataFrame):
         """

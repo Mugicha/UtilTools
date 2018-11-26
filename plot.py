@@ -150,17 +150,17 @@ class Plot():
         plt.savefig(os.path.join(_path, 'pcolormesh.png'))
         plt.close()
 
-    def show_correlogram(self, _df: pd.DataFrame, _col: str, _lag=10, _file='correlogram.png', _path='./'):
+    def show_correlogram(self, _df: pd.DataFrame, _col: int, _lag=10, _file='correlogram.png', _path='./'):
         """
-        コレログラムのグラフを画像として保存する機能
+        コレログラムのグラフを画像として保存する機能。欠損値を補完しておく必要がある。
         :param _df: 対象のデータフレーム
-        :param _col: データフレーム中の列名
-        :param _lag: コレログラムで表示するラグ
-        :param _file: 保存する画像ファイルの名前
-        :param _path: 保存先のパス
+        :param _col: コレログラムでプロットしたいデータフレームの列名
+        :param _lag: コレログラムで表示するラグ(デフォルト値: 10）
+        :param _file: 保存する画像ファイルの名前（デフォルト値: correlogram.png）
+        :param _path: 保存先のパス（デフォルト値: カレントディレクトリ）
         :return:
         """
         import statsmodels.api as sm
         fig, ax = plt.subplots(nrows=1, figsize=(16, 12))
-        sm.graphics.tsa.plot_acf(_df[_col], lags=_lag, ax=ax)
+        sm.graphics.tsa.plot_acf(_df.iloc[:, _col], lags=_lag, ax=ax)
         plt.savefig(os.path.join(_path, _file))
