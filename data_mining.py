@@ -1,6 +1,6 @@
-from sklearn.decomposition import PCA
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class DataManipulation():
@@ -13,6 +13,7 @@ class DataManipulation():
         :param _return_with_model: 主成分分析のモデルもreturnするかどうかのフラグ
         :return: 主成分分析後のデータフレーム(DataFrame)
         """
+        from sklearn.decomposition import PCA
         pca = PCA(n_components=_dim)  # type: PCA
         pca.fit(_df.values)
         transformed = pca.fit_transform(_df.values)  # type: np.ndarray

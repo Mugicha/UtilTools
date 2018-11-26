@@ -3,6 +3,18 @@ import pandas as pd
 
 class FileOperation():
 
+    def detect_char_code(self, _path: str):
+        """
+        指定したファイルの文字コードを判別して返す機能
+        :param _path: 文字コードを判別したいファイル
+        :return: 文字コード
+        """
+        import chardet
+        with open(_path, mode='rb') as f:
+            binary = f.readline()
+            result = chardet.detect(binary)
+            return result['encoding']
+
     def csv_to_df(self, _path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc=0):
         """
         import csv and return the data as DataFrame.
@@ -15,7 +27,7 @@ class FileOperation():
         if date_convert:
             my_parser = lambda date: pd.datetime.strptime(date, date_format)
             #try:
-            return pd.read_csv(_path, parse_dates=[date_data_loc], date_parser=my_parser)
+            return pd.read_csv(_path, parse_dates=[date_data_loc], date_parser=my_parser, encoding=self.detect_char_code(_path))
             #except:
             #    print('Cannot import csv file or convert time format.')
             #    exit(1)
@@ -26,7 +38,7 @@ class FileOperation():
             exit(1)
 
     def df_to_csv(self, _df: pd.DataFrame, _path='./UtilTool.csv'):
-        _df.to_csv(_path)
+        _df.to_csv(_path, index=False)
 
     def excel_to_df(self, _input_file: str):
         """

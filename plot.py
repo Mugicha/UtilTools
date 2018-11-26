@@ -3,39 +3,50 @@ from matplotlib.colors import ListedColormap
 import seaborn as sns
 import pandas as pd
 import os
+import UtilTools.common
 
 
 class Plot():
 
-    def pure_2d_plot(self, _df: pd.DataFrame, _x: int, _y: int):
+    def pure_2d_plot(self, _df: pd.DataFrame, _x: int, _y: int, _title='pure_2d_plot', _path='./', _f='pure_2d_plot.png'):
         """
         DataFrame内の2列を使って二次元プロットを行う機能。
         :param _df: 使用するDataFrame
         :param _x: x軸のラベル番号
         :param _y: y軸のラベル番号
+        :param _title: グラフのタイトル
         :return: matplotlib.pyplotクラス
         """
-        plt.figure(figsize=(8, 6))  # plot size
+        plt.figure(figsize=(16, 12))  # plot size
+        plt.title(_title)
+        plt.tight_layout()
         plt.plot(_df.iloc[:, _x].values, _df.iloc[:, _y].values)
-        return plt
+        plt.savefig(os.path.join(_path, _f))
+        plt.close()
+        # return plt
 
-    def pure_2d_scatter(self, _df: pd.DataFrame, _x: int, _y: int, _t='pure_2d_scatter', _s=0.5, _path='./', _f='pure_2d_scatter.png'):
+    def pure_2d_scatter(self, _df: pd.DataFrame, _x: int, _y: int, _title='pure_2d_scatter', _s=0.5, _path='./', _f='pure_2d_scatter.png'):
         """
         DataFrame内の2列を使って二次元プロットを行う機能。
         :param _df: 使用するDataFrame
         :param _x: x軸のラベル番号
         :param _y: y軸のラベル番号
-        :param _t: タイトル
+        :param _title: タイトル
         :param _s: Size of scatter plot.
         :param _path: folder path for saving figure.
         :param _f: file name of figure.
         :return: matplotlib.pyplotクラス
         """
-        plt.figure(figsize=(8, 6))  # plot size
-        plt.title(_t)
+        c = UtilTools.common.Common()
+        plt.figure(figsize=(16, 12))  # plot size
+        plt.title(_title)
+        plt.xticks(rotation=90)
+        plt.tight_layout()
         plt.scatter(_df.iloc[:, _x].values, _df.iloc[:, _y].values, s=_s)
-        plt.savefig(os.path.join(_path, _f))
-        return plt
+        if c.folder_check(_path):
+            plt.savefig(os.path.join(_path, _f))
+        plt.close()
+        # return plt
 
     def corr_map(self, _df: pd.DataFrame, _path='./'):
         """
@@ -44,12 +55,14 @@ class Plot():
         :param _path: 保存するフォルダのパス
         :return: None.
         """
-        plt.figure(figsize=(8, 6))  # heat map size
+        plt.figure(figsize=(16, 12))  # heat map size
         sns.set(font_scale=0.6)
+        plt.tight_layout()
         sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5, annot_kws={"size": 5})
         plt.yticks(rotation=0)
         plt.xticks(rotation=90)
         plt.savefig(os.path.join(_path, 'corr_map.png'))
+        plt.close()
 
     def scatter_with_histogram(self, _df: pd.DataFrame, dim_reduction=False, _path='./'):
         """
@@ -59,7 +72,8 @@ class Plot():
         :param _path: 保存するフォルダのパス
         :return: None.
         """
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(16, 12))
+        plt.xticks(rotation=90)
         if dim_reduction:
             from UtilTools.data_mining import DataManipulation
             pca = DataManipulation()
@@ -67,8 +81,10 @@ class Plot():
             sns.jointplot(0, 1, _trn, kind='scatter')
             plt.savefig('scatter_with_histogram_pca.png')
             return None
+        plt.tight_layout()
         sns.jointplot(0, 1, _df, kind='scatter')
         plt.savefig(os.path.join(_path, 'scatter_with_histogram.png'))
+        plt.close()
 
     def pair_plot(self, _df: pd.DataFrame, _path='./'):
         """
@@ -77,9 +93,12 @@ class Plot():
         :param _path: 保存するフォルダのパス
         :return: None.
         """
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(16, 12))
+        plt.xticks(rotation=90)
+        plt.tight_layout()
         sns.pairplot(_df)
         plt.savefig(os.path.join(_path, 'pair_plot.png'))
+        plt.close()
 
     def scatter_emphasis(self, _df: pd.DataFrame, _x: int, _y: int, _c: int, _path='./', _s=2):
         """
@@ -96,8 +115,11 @@ class Plot():
         plt.xlabel(_df.columns.values[_x])
         plt.ylabel(_df.columns.values[_y])
         plt.title(_df.columns.values[_c])
+        plt.xticks(rotation=90)
+        plt.tight_layout()
         plt.scatter(_df.iloc[:, _x], _df.iloc[:, _y], c=_df.iloc[:, _c], cmap=colors, s=_s)
         plt.savefig(os.path.join(_path, 'scatter_emphasis.png'))
+        plt.close()
 
     def colormap(self, _df: pd.DataFrame, _x: str, _y: str, _z: str, _path='./'):
         """
@@ -114,6 +136,9 @@ class Plot():
         tmp = _df.loc[:, [_x, _y, _z]]
         for i in range(tmp[_y].min(), tmp[_y].max() + 1):
             z.append(tmp[tmp[_y] == i].sort_values(_x)[_z].values)
+        print(len(z[0]))
+        print(len(z[1]))
+        print()
         plt.pcolormesh(_df['date'].drop_duplicates().sort_values().values, _df['キロ程'].drop_duplicates().sort_values().values, z, cmap='hsv')
         pp = plt.colorbar(orientation='vertical')
         pp.set_label(_z)
@@ -123,3 +148,19 @@ class Plot():
         plt.xticks(rotation=90)
         plt.tight_layout()
         plt.savefig(os.path.join(_path, 'pcolormesh.png'))
+        plt.close()
+
+    def show_correlogram(self, _df: pd.DataFrame, _col: str, _lag=10, _file='correlogram.png', _path='./'):
+        """
+        コレログラムのグラフを画像として保存する機能
+        :param _df: 対象のデータフレーム
+        :param _col: データフレーム中の列名
+        :param _lag: コレログラムで表示するラグ
+        :param _file: 保存する画像ファイルの名前
+        :param _path: 保存先のパス
+        :return:
+        """
+        import statsmodels.api as sm
+        fig, ax = plt.subplots(nrows=1, figsize=(16, 12))
+        sm.graphics.tsa.plot_acf(_df[_col], lags=_lag, ax=ax)
+        plt.savefig(os.path.join(_path, _file))
