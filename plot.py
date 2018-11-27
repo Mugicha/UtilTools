@@ -3,7 +3,7 @@ from matplotlib.colors import ListedColormap
 import seaborn as sns
 import pandas as pd
 import os
-import UtilTools.common
+from . import common
 
 
 class Plot():
@@ -37,7 +37,7 @@ class Plot():
         :param _f: file name of figure.
         :return: matplotlib.pyplotクラス
         """
-        c = UtilTools.common.Common()
+        c = common.Common()
         plt.figure(figsize=(16, 12))  # plot size
         plt.title(_title)
         plt.xticks(rotation=90)
@@ -48,20 +48,29 @@ class Plot():
         plt.close()
         # return plt
 
-    def corr_map(self, _df: pd.DataFrame, _path='./'):
+    def corr_map(self,
+                 _df: pd.DataFrame,
+                 _output_folder_path='./',
+                 _output_file_name='corr_map.png',
+                 _figsize=(16, 12),
+                 _graph_title='corr_map'):
         """
         各変数の相関係数のヒートマップ画像を保存する機能。
         :param _df: ヒートマップの基となるDataFrame.
-        :param _path: 保存するフォルダのパス
+        :param _output_folder_path: 保存するフォルダのパス（デフォルト：カレントディレクトリ）
+        :param _output_file_name: 保存する画像ファイル名（デフォルト：corr_map.png）
+        :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12)
+        :param _graph_title: グラフのタイトル（デフォルト：corr_map）
         :return: None.
         """
-        plt.figure(figsize=(16, 12))  # heat map size
+        plt.figure(figsize=_figsize)  # heat map size
+        # plt.title(_graph_title)
         sns.set(font_scale=0.6)
-        plt.tight_layout()
-        sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5, annot_kws={"size": 5})
+        sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5, annot_kws={"size": 5}, vmin=0, vmax=1)
         plt.yticks(rotation=0)
         plt.xticks(rotation=90)
-        plt.savefig(os.path.join(_path, 'corr_map.png'))
+        plt.tight_layout()
+        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
     def scatter_with_histogram(self, _df: pd.DataFrame, dim_reduction=False, _path='./'):
@@ -75,7 +84,7 @@ class Plot():
         plt.figure(figsize=(16, 12))
         plt.xticks(rotation=90)
         if dim_reduction:
-            from UtilTools.data_mining import DataManipulation
+            from .data_mining import DataManipulation
             pca = DataManipulation()
             _trn = pd.DataFrame(pca.pca_reduction(_df, 2, False))
             sns.jointplot(0, 1, _trn, kind='scatter')
@@ -111,7 +120,14 @@ class Plot():
         :param _s: size of point.
         :return: None.
         """
-        colors = ListedColormap(['red', 'blue'])
+        plt.figure(figsize=(16, 12))
+        color_box = ['red', 'm', 'darkorange', 'g', 'c', 'blue', 'darkviolet', 'brown', 'yellow', 'lime']
+        number_of_label = len(common.Common().remove_duplication(_df.iloc[:, _c].values))
+        if number_of_label > 10:
+            print('[Warn] The number of label is too large. ' +
+                  'Reduce it less than 10. Or add color to the variable named "color_box" in scatter_emphasis of plot.py.')
+        color_label = color_box[0:number_of_label]
+        colors = ListedColormap(color_label)
         plt.xlabel(_df.columns.values[_x])
         plt.ylabel(_df.columns.values[_y])
         plt.title(_df.columns.values[_c])
