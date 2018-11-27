@@ -14,7 +14,7 @@ class Plot():
                      _y: int,
                      _figsize=(16, 12),
                      _title='pure_2d_plot',
-                     _path='./',
+                     _output_folder_path='./',
                      _output_file_name='pure_2d_plot.png'):
         """
         DataFrame内の2列を使って二次元プロットを行う機能。
@@ -23,7 +23,7 @@ class Plot():
         :param _y: y軸のラベル番号
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12)
         :param _title: グラフのタイトル
-        :param _path: folder path for saving figure.
+        :param _output_folder_path: folder path for saving figure.
         :param _output_file_name: file name of figure.
         :return: matplotlib.pyplotクラス
         """
@@ -31,7 +31,7 @@ class Plot():
         plt.title(_title)
         plt.tight_layout()
         plt.plot(_df.iloc[:, _x].values, _df.iloc[:, _y].values)
-        plt.savefig(os.path.join(_path, _output_file_name))
+        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
         # return plt
 
@@ -42,7 +42,7 @@ class Plot():
                         _figsize=(16, 12),
                         _title='pure_2d_scatter',
                         _s=0.5,
-                        _path='./',
+                        _output_folder_path='./',
                         _output_file_name='pure_2d_scatter.png'):
         """
         DataFrame内の2列を使って二次元プロットを行う機能。
@@ -52,7 +52,7 @@ class Plot():
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12)
         :param _title: タイトル
         :param _s: Size of scatter plot.
-        :param _path: folder path for saving figure.
+        :param _output_folder_path: folder path for saving figure.
         :param _output_file_name: file name of figure.
         :return: matplotlib.pyplotクラス
         """
@@ -62,8 +62,8 @@ class Plot():
         plt.xticks(rotation=90)
         plt.tight_layout()
         plt.scatter(_df.iloc[:, _x].values, _df.iloc[:, _y].values, s=_s)
-        if c.folder_check(_path):
-            plt.savefig(os.path.join(_path, _output_file_name))
+        if c.folder_check(_output_folder_path):
+            plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
         # return plt
 
@@ -96,14 +96,14 @@ class Plot():
                                _df: pd.DataFrame,
                                dim_reduction=False,
                                _figsize=(16, 12),
-                               _path='./',
+                               _output_folder_path='./',
                                _output_file_name='scatter_with_histogram.png'):
         """
         ヒストグラム付き散布図の画像を保存する機能。
         :param _df: 散布図の基となるDataFrame.
         :param dim_reduction: 次元削減するかどうか(default=False)
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12)
-        :param _path: 保存するフォルダのパス
+        :param _output_folder_path: 保存するフォルダのパス
         :param _output_file_name: 保存する画像ファイル名（デフォルト：scatter_with_histogram.png）
         :return: None.
         """
@@ -118,15 +118,19 @@ class Plot():
             return None
         plt.tight_layout()
         sns.jointplot(0, 1, _df, kind='scatter')
-        plt.savefig(os.path.join(_path, _output_file_name))
+        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
-    def pair_plot(self, _df: pd.DataFrame, _figsize=(16, 12), _path='./', _output_file_name='pair_plot.png'):
+    def pair_plot(self,
+                  _df: pd.DataFrame,
+                  _figsize=(16, 12),
+                  _output_folder_path='./',
+                  _output_file_name='pair_plot.png'):
         """
         seabornのPariplot画像を保存する機能。
         :param _df: pairplotしたいDataFrame
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12))
-        :param _path: 保存するフォルダのパス
+        :param _output_folder_path: 保存するフォルダのパス
         :param _output_file_name: 保存する画像ファイル名（デフォルト：pair_plot.png）
         :return: None.
         """
@@ -134,7 +138,7 @@ class Plot():
         plt.xticks(rotation=90)
         plt.tight_layout()
         sns.pairplot(_df)
-        plt.savefig(os.path.join(_path, _output_file_name))
+        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
     def scatter_emphasis(self,
@@ -143,7 +147,7 @@ class Plot():
                          _y: int,
                          _c: int,
                          _figsize=(16, 12),
-                         _path='./',
+                         _output_folder_path='./',
                          _output_file_name='scatter_emphasis.png',
                          _s=2):
         """
@@ -153,7 +157,7 @@ class Plot():
         :param _y: y軸の要素
         :param _c: 色を変えるラベルとなる要素
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12))
-        :param _path: 保存するフォルダのパス
+        :param _output_folder_path: 保存するフォルダのパス
         :param _output_file_name: 保存する画像ファイル名（デフォルト：scatter_emphasis.png）
         :param _s: size of point.
         :return: None.
@@ -172,7 +176,7 @@ class Plot():
         plt.xticks(rotation=90)
         plt.tight_layout()
         plt.scatter(_df.iloc[:, _x], _df.iloc[:, _y], c=_df.iloc[:, _c], cmap=colors, s=_s)
-        plt.savefig(os.path.join(_path, _output_file_name))
+        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
     def colormap(self,
@@ -181,7 +185,7 @@ class Plot():
                  _y: str,
                  _z: str,
                  _figsize=(16, 12),
-                 _path='./',
+                 _output_folder_path='./',
                  _output_file_name='pcolormesh.png'):
         """
         二次元カラーマップを作製する機能
@@ -190,7 +194,7 @@ class Plot():
         :param _y: y軸としたい項目名
         :param _z: z（等高線）で示したい項目名
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12))
-        :param _path: 保存するフォルダのパス
+        :param _output_folder_path: 保存するフォルダのパス
         :param _output_file_name: 保存する画像ファイル名（デフォルト：pcolormesh.png）
         :return: None
         """
@@ -210,7 +214,7 @@ class Plot():
         plt.tight_layout()
         plt.xticks(rotation=90)
         plt.tight_layout()
-        plt.savefig(os.path.join(_path, _output_file_name))
+        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
     def show_correlogram(self,
@@ -218,8 +222,8 @@ class Plot():
                          _col: int,
                          _lag=10,
                          _figsize=(16, 12),
-                         _output_file_name='correlogram.png',
-                         _path='./'):
+                         _output_folder_path='./',
+                         _output_file_name='correlogram.png'):
         """
         コレログラムのグラフを画像として保存する機能。欠損値を補完しておく必要がある。
         :param _df: 対象のデータフレーム
@@ -227,7 +231,7 @@ class Plot():
         :param _lag: コレログラムで表示するラグ(デフォルト値: 10）
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12))
         :param _output_file_name: 保存する画像ファイルの名前（デフォルト値: correlogram.png）
-        :param _path: 保存先のパス（デフォルト値: カレントディレクトリ）
+        :param _output_folder_path: 保存先のパス（デフォルト値: カレントディレクトリ）
         :return:
         """
         import statsmodels.api as sm
@@ -236,4 +240,4 @@ class Plot():
         plt.ylabel('Correlation coefficient')
         sm.graphics.tsa.plot_acf(_df.iloc[:, _col], lags=_lag, ax=ax)
         plt.tight_layout()
-        plt.savefig(os.path.join(_path, _output_file_name))
+        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
