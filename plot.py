@@ -109,7 +109,7 @@ class Plot():
         plt.savefig(os.path.join(_path, 'pair_plot.png'))
         plt.close()
 
-    def scatter_emphasis(self, _df: pd.DataFrame, _x: int, _y: int, _c: int, _path='./', _s=2):
+    def scatter_emphasis(self, _df: pd.DataFrame, _x: int, _y: int, _c: int, _path='./', _output_file_name='scatter_emphasis.png', _s=2):
         """
         ラベルによって色を変えて散布図を表示する機能。
         :param _df: 表示させたいDataFrame
@@ -134,7 +134,7 @@ class Plot():
         plt.xticks(rotation=90)
         plt.tight_layout()
         plt.scatter(_df.iloc[:, _x], _df.iloc[:, _y], c=_df.iloc[:, _c], cmap=colors, s=_s)
-        plt.savefig(os.path.join(_path, 'scatter_emphasis.png'))
+        plt.savefig(os.path.join(_path, _output_file_name))
         plt.close()
 
     def colormap(self, _df: pd.DataFrame, _x: str, _y: str, _z: str, _path='./'):
@@ -166,13 +166,13 @@ class Plot():
         plt.savefig(os.path.join(_path, 'pcolormesh.png'))
         plt.close()
 
-    def show_correlogram(self, _df: pd.DataFrame, _col: int, _lag=10, _file='correlogram.png', _path='./'):
+    def show_correlogram(self, _df: pd.DataFrame, _col: int, _lag=10, _output_file_name='correlogram.png', _path='./'):
         """
         コレログラムのグラフを画像として保存する機能。欠損値を補完しておく必要がある。
         :param _df: 対象のデータフレーム
         :param _col: コレログラムでプロットしたいデータフレームの列名
         :param _lag: コレログラムで表示するラグ(デフォルト値: 10）
-        :param _file: 保存する画像ファイルの名前（デフォルト値: correlogram.png）
+        :param _output_file_name: 保存する画像ファイルの名前（デフォルト値: correlogram.png）
         :param _path: 保存先のパス（デフォルト値: カレントディレクトリ）
         :return:
         """
@@ -182,4 +182,4 @@ class Plot():
         plt.ylabel('Correlation coefficient')
         sm.graphics.tsa.plot_acf(_df.iloc[:, _col], lags=_lag, ax=ax)
         plt.tight_layout()
-        plt.savefig(os.path.join(_path, _file))
+        plt.savefig(os.path.join(_path, _output_file_name))
