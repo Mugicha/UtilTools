@@ -2,9 +2,28 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.decomposition import FastICA
 
 
 class DataManipulation():
+
+    def ica_reduction(self, _df: pd.DataFrame, _dim: int, _return_with_model=False):
+        """
+        独立成分分析でノイズを除去するもの。
+        :param _df: 次元削減したいデータ(DataFrame形式)
+        :param _dim: 削減後の次元数
+        :param _return_with_model: 主成分分析のモデルもreturnするかどうかのフラグ
+        :return: 主成分分析後のデータフレーム(ndarray)
+        """
+        ica = FastICA(n_components=_dim)  # type: FastICA
+        M = np.mean(_df.values, axis=1)[:, np.newaxis]  # type: np.ndarray
+        norm_ary = _df.values - M  # type: np.ndarray
+        ica.fit(norm_ary)
+        transformed = ica.transform(norm_ary)
+        if _return_with_model:
+            return transformed, ica
+        else:
+            return transformed
 
     def pca_reduction(self, _df: pd.DataFrame, _dim: int, _return_with_model=False):
         """
@@ -12,7 +31,7 @@ class DataManipulation():
         :param _df: 次元削減したいデータ(DataFrame形式)
         :param _dim: 削減後の次元数
         :param _return_with_model: 主成分分析のモデルもreturnするかどうかのフラグ
-        :return: 主成分分析後のデータフレーム(DataFrame)
+        :return: 主成分分析後のデータフレーム(ndarray)
         """
         pca = PCA(n_components=_dim)  # type: PCA
         pca.fit(_df.values)

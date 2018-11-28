@@ -85,7 +85,7 @@ class Plot():
         plt.figure(figsize=_figsize)  # heat map size
         # plt.title(_graph_title)
         sns.set(font_scale=0.6)
-        sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5, annot_kws={"size": 5}, vmin=0, vmax=1)
+        sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5, annot_kws={"size": 5}, vmin=-1, vmax=1)
         plt.yticks(rotation=0)
         plt.xticks(rotation=90)
         plt.tight_layout()
