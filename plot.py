@@ -57,7 +57,7 @@ class Plot():
         :return: matplotlib.pyplotクラス
         """
         c = common.Common()
-        plt.figure(_figsize)  # plot size
+        plt.figure(figsize=_figsize)  # plot size
         plt.title(_title)
         plt.xticks(rotation=90)
         plt.tight_layout()
