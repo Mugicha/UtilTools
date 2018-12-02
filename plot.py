@@ -94,10 +94,10 @@ class Plot():
 
     def scatter_with_histogram(self,
                                _df: pd.DataFrame,
-                               dim_reduction=False,
-                               _figsize=(16, 12),
-                               _output_folder_path='./',
-                               _output_file_name='scatter_with_histogram.png'):
+                               dim_reduction: bool=False,
+                               _figsize: tuple=(16, 12),
+                               _output_folder_path: str='./',
+                               _output_file_name: str='scatter_with_histogram.png'):
         """
         ヒストグラム付き散布図の画像を保存する機能。
         :param _df: 散布図の基となるDataFrame.
@@ -107,7 +107,7 @@ class Plot():
         :param _output_file_name: 保存する画像ファイル名（デフォルト：scatter_with_histogram.png）
         :return: None.
         """
-        plt.figure(_figsize)
+        plt.figure(figsize=_figsize)
         plt.xticks(rotation=90)
         if dim_reduction:
             from .data_mining import DataManipulation
@@ -123,9 +123,9 @@ class Plot():
 
     def pair_plot(self,
                   _df: pd.DataFrame,
-                  _figsize=(16, 12),
-                  _output_folder_path='./',
-                  _output_file_name='pair_plot.png'):
+                  _figsize: tuple=(16, 12),
+                  _output_folder_path: str='./',
+                  _output_file_name: str='pair_plot.png'):
         """
         seabornのPariplot画像を保存する機能。
         :param _df: pairplotしたいDataFrame
@@ -146,10 +146,10 @@ class Plot():
                          _x: int,
                          _y: int,
                          _c: int,
-                         _figsize=(16, 12),
-                         _output_folder_path='./',
-                         _output_file_name='scatter_emphasis.png',
-                         _s=2):
+                         _figsize: tuple=(16, 12),
+                         _output_folder_path: str='./',
+                         _output_file_name: str='scatter_emphasis.png',
+                         _s: int=2):
         """
         ラベルによって色を変えて散布図を表示する機能。
         :param _df: 表示させたいDataFrame
@@ -184,9 +184,9 @@ class Plot():
                  _x: str,
                  _y: str,
                  _z: str,
-                 _figsize=(16, 12),
-                 _output_folder_path='./',
-                 _output_file_name='pcolormesh.png'):
+                 _figsize: tuple=(16, 12),
+                 _output_folder_path: str='./',
+                 _output_file_name: str='pcolormesh.png'):
         """
         二次元カラーマップを作製する機能
         :param _df: プロットの基となるDataFrame
@@ -220,10 +220,10 @@ class Plot():
     def show_correlogram(self,
                          _df: pd.DataFrame,
                          _col: int,
-                         _lag=10,
-                         _figsize=(16, 12),
-                         _output_folder_path='./',
-                         _output_file_name='correlogram.png'):
+                         _lag: int=10,
+                         _figsize: tuple=(16, 12),
+                         _output_folder_path: str='./',
+                         _output_file_name: str='correlogram.png'):
         """
         コレログラムのグラフを画像として保存する機能。欠損値を補完しておく必要がある。
         :param _df: 対象のデータフレーム
@@ -241,3 +241,9 @@ class Plot():
         sm.graphics.tsa.plot_acf(_df.iloc[:, _col], lags=_lag, ax=ax)
         plt.tight_layout()
         plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+
+    def plot_all_combination(self, _df: pd.DataFrame, _cols: list):
+        import UtilTools.common
+        c = UtilTools.common.Common()
+        combination = c.extract_all_combination(_df, _cols)
+        self.pure_2d_scatter(_df=_df, _x=0, _y=1)
