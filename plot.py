@@ -242,8 +242,18 @@ class Plot():
         plt.tight_layout()
         plt.savefig(os.path.join(_output_folder_path, _output_file_name))
 
-    def plot_all_combination(self, _df: pd.DataFrame, _cols: list):
+    def plot_all_combination(self, _df: pd.DataFrame, _cols: list, _x: int, _y: int):
+        """
+        DataFrameの中にあるキー情報の前組合せにてグラフをプロットする機能。
+        :param _df: 対象のDataFrame
+        :param _cols: キー情報としたい列名（column名で）
+        :param _x: プロットするときのx軸（番号）
+        :param _y: プロットするときのy軸（番号）
+        :return:
+        """
         import UtilTools.common
         c = UtilTools.common.Common()
         combination = c.extract_all_combination(_df, _cols)
-        self.pure_2d_scatter(_df=_df, _x=0, _y=1)
+        for each_combination in combination:
+            _df_extracted = _df[_df[_cols[0] == each_combination[0]] & _df[_cols[1] == each_combination[1]]]
+            self.pure_2d_scatter(_df=_df_extracted, _x=_x, _y=_y)
