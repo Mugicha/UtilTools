@@ -67,7 +67,7 @@ class Common:
         if not os.path.isdir(_path):
             try:
                 os.mkdir(_path)
-                print('[folder_check] Create -> ' + _path)
+                print('[common.py][folder_check] Create -> ' + _path)
                 return True
             except:
                 print('[common.py][Warn] Cannot create folder. ' + _path)
