@@ -1,7 +1,34 @@
 import pandas as pd
+import os
 
 
 class FileOperation():
+
+    def __init__(self):
+        pass
+
+    def get_file_list(self, _input_path: str, _is_recursive: bool = False, _is_abspath: bool = False):
+        """
+        指定したフォルダの中のファイルリストを作成し、配列として返す機能
+        :param _input_path: ファイルリストを取得したいフォルダパス
+        :param _is_recursive: 指定したフォルダの中にサブフォルダがある場合、そこも検索するか(default:検索しない)
+        :param _is_abspath: 戻り値のファイルパスは絶対パスにするか(default: _input_pathからの相対パス)
+        :return:
+        """
+        # 再帰的に検索
+        if _is_recursive:
+            fileList = []
+            for root, dirs, files in os.walk(_input_path):
+                for fr in files:
+                    if os.path.isfile(os.path.join(root, fr)):
+                        fileList.append(os.path.join(dirs, fr))
+            return fileList
+
+        # 再帰的に検索しない
+        else:
+            files = os.listdir(_input_path)
+            print(files)
+            return [f for f in files if os.path.isfile(os.path.join(_input_path, f))]
 
     def detect_char_code(self, _path: str):
         """
@@ -46,6 +73,9 @@ class FileOperation():
         :param _input_file: 入力するExcelのファイルパス
         :return: Excelデータを格納したDataFrame(読み込めない場合はNone)
         """
+        if not os.path.splitext(_input_file)[1] in ['.xlsx', '.xls']:
+            print('[file_operation.py][excel_to_df] Input file must be xlsx or xls.')
+            exit(1)
         try:
             entire_row_data = pd.ExcelFile(_input_file, encoding='utf8')
         except:
@@ -102,3 +132,9 @@ class FileOperation():
             f.write('\n'.join(_list))
             f.write('\n')
         f.close()
+
+
+if __name__ == '__main__':
+    f = FileOperation()
+    retu = f.get_file_list(_input_path=r"C:\Users\dainichi.sukita\Documents\01.study\01.AI\06.SIGNATE\01\program", _is_recursive=True)
+    print(retu)
