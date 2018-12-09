@@ -4,24 +4,38 @@ import os
 
 class FileOperation():
 
-    def __init__(self):
-        pass
-
-    def get_file_list(self, _input_path: str, _is_recursive: bool = False, _is_abspath: bool = False):
+    def get_file_list(self, _input_path: str, _is_recursive: bool = False, _can_return_abspath: bool = False):
         """
         指定したフォルダの中のファイルリストを作成し、配列として返す機能
         :param _input_path: ファイルリストを取得したいフォルダパス
         :param _is_recursive: 指定したフォルダの中にサブフォルダがある場合、そこも検索するか(default:検索しない)
-        :param _is_abspath: 戻り値のファイルパスは絶対パスにするか(default: _input_pathからの相対パス)
+        :param _can_return_abspath: 戻り値のファイルパスは絶対パスにするか(default: _input_pathからの相対パス)
         :return:
         """
+        # Exit if input path is file path.
+        if os.path.isfile(_input_path):
+            print('[file_operation.py][get_file_list][Warn] Do not input file path.')
+            exit(1)
         # 再帰的に検索
         if _is_recursive:
             fileList = []
             for root, dirs, files in os.walk(_input_path):
                 for fr in files:
                     if os.path.isfile(os.path.join(root, fr)):
-                        fileList.append(os.path.join(dirs, fr))
+                        # return with absolute path.
+                        if _can_return_abspath:
+                            fileList.append(os.path.join(root, fr))
+                        else:
+                            local_root = os.path.split(_input_path)[1]
+                            if os.name == 'nt':
+                                ary = root.split('\\')
+                            else:
+                                ary = root.split('/')
+                            if len(ary[ary.index(local_root)+1:-1]) == 0:
+                                relative_path = './' + fr
+                            else:
+                                relative_path = './' + '/'.join(ary[ary.index(local_root)+1:-1]) + '/' + fr
+                            fileList.append(relative_path)
             return fileList
 
         # 再帰的に検索しない
@@ -136,5 +150,5 @@ class FileOperation():
 
 if __name__ == '__main__':
     f = FileOperation()
-    retu = f.get_file_list(_input_path=r"C:\Users\dainichi.sukita\Documents\01.study\01.AI\06.SIGNATE\01\program", _is_recursive=True)
+    retu = f.get_file_list(_input_path=r"C:\Users\dainichi.sukita\Documents\01.study\01.AI\06.SIGNATE\01\program", _is_recursive=True, _can_return_abspath=False)
     print(retu)
