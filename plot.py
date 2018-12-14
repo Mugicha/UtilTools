@@ -245,7 +245,7 @@ class Plot():
 
     def plot_all_combination(self, _df: pd.DataFrame, _cols: list, _x: int, _y: int):
         """
-        DataFrameの中にあるキー情報の前組合せにてグラフをプロットする機能。
+        DataFrameの中にあるキー情報の全組合せにてグラフをプロットする機能。
         :param _df: 対象のDataFrame
         :param _cols: キー情報としたい列名（column名で）
         :param _x: プロットするときのx軸（番号）

@@ -42,7 +42,7 @@ class DataManipulation():
 
     def fill_na(self, _df: pd.DataFrame, _typ: int):
         """
-        fill na with previous value.
+        fill na to all columns with previous value.
         :param _df: NAを埋めたいData Frame.
         :param _typ: NAの埋め方（0: 前行値で補完、1: 線形補完）
         :return:  NAを前行の値で埋めたDataFrame.
