@@ -11,7 +11,7 @@ class Plot():
     def pure_2d_plot(self,
                      _df: pd.DataFrame,
                      _x: int,
-                     _y: int,
+                     _y: list,
                      _figsize=(16, 12),
                      _title='pure_2d_plot',
                      _output_folder_path='./',
@@ -30,7 +30,11 @@ class Plot():
         plt.figure(figsize=_figsize)  # plot size
         plt.title(_title)
         plt.tight_layout()
-        plt.plot(_df.iloc[:, _x].values, _df.iloc[:, _y].values)
+        column = _df.columns.values
+        for data in _y:
+            plt.plot(_df.iloc[:, _x].values, _df.iloc[:, data].values, label=column[data])
+        if len(_y) > 1:
+            plt.legend()
         plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
         # return plt
