@@ -35,7 +35,8 @@ class Plot:
             plt.plot(_df.iloc[:, _x].values, _df.iloc[:, data].values, label=column[data])
         if len(_y) > 1:
             plt.legend()
-        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+        # plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+        plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
         # return plt
 

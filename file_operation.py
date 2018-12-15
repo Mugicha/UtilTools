@@ -58,8 +58,7 @@ class FileOperation:
             result = chardet.detect(binary)
             return result['encoding']
 
-    @staticmethod
-    def csv_to_df(_path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc=0):
+    def csv_to_df(self, _path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc=0):
         """
         import csv and return the data as DataFrame.
         :param _path: csv path
