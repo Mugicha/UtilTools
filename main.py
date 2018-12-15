@@ -8,11 +8,11 @@ class App(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.title = 'PyQt5 tabs - pythonspot.com'
+        self.title = 'Util Tools for all people.'
         self.left = 0
         self.top = 0
-        self.width = 300
-        self.height = 200
+        self.width = 400
+        self.height = 300
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
@@ -31,7 +31,7 @@ class MyTableWidget(QWidget):
         # Initialize tab screen
         self.tabs = QTabWidget()
         self.tab1 = QWidget()
-        self.tab2 = QWidget()
+        self.tab2 = DropWidget()
         self.tabs.resize(300, 200)
 
         # Add tabs
@@ -55,7 +55,34 @@ class MyTableWidget(QWidget):
             print(currentQTableWidgetItem.row(), currentQTableWidgetItem.column(), currentQTableWidgetItem.text())
 
 
+class DropWidget(QWidget):
+
+    def __init__(self, parent=None):
+        super(DropWidget, self).__init__(parent)
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, event):
+        event.accept()
+        mimeData = event.mimeData()
+        print('dragEnterEvent')
+        for mimetype in mimeData.formats():
+            print('MIMEType:', mimetype)
+            print('Data:', mimeData.data(mimetype))
+            print()
+        print()
+
+    def dropEvent(self, event):
+        event.accept()
+        mimeData = event.mimeData()
+        print('dropEvent')
+        for mimetype in mimeData.formats():
+            print('MIMEType:', mimetype)
+            print('Data:', mimeData.data(mimetype))
+            print()
+        print()
+
+
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = App()
-    sys.exit(app.exec_())
+    app = QApplication(sys.argv)  # define application.
+    ex = App()  # Create Widget.
+    sys.exit(app.exec_())  # Exit Application.
