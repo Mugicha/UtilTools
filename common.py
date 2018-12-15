@@ -75,7 +75,6 @@ class Common:
                 print('[common.py][Warn] Cannot create folder. ' + _path)
                 return False
         else:
-            # print('[folder_check] Exist -> ' + _path)
             return True
 
     @staticmethod

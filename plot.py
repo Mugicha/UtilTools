@@ -7,7 +7,6 @@ from . import common
 
 
 class Plot:
-
     @staticmethod
     def pure_2d_plot(_df: pd.DataFrame,
                      _x: int,
@@ -35,7 +34,6 @@ class Plot:
             plt.plot(_df.iloc[:, _x].values, _df.iloc[:, data].values, label=column[data])
         if len(_y) > 1:
             plt.legend()
-        # plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
         # return plt
@@ -68,7 +66,7 @@ class Plot:
         plt.tight_layout()
         plt.scatter(_df.iloc[:, _x].values, _df.iloc[:, _y].values, s=_s)
         if c.folder_check(_output_folder_path):
-            plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+            plt.savefig(c.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
         # return plt
 
@@ -88,13 +86,13 @@ class Plot:
         :return: None.
         """
         plt.figure(figsize=_figsize)  # heat map size
-        # plt.title(_graph_title)
+        plt.title(_graph_title)
         sns.set(font_scale=0.6)
         sns.heatmap(_df.corr(), annot=True, cmap='plasma', linewidths=.5, annot_kws={"size": 5}, vmin=-1, vmax=1)
         plt.yticks(rotation=0)
         plt.xticks(rotation=90)
         plt.tight_layout()
-        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+        plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
 
     @staticmethod
@@ -123,7 +121,7 @@ class Plot:
             return None
         plt.tight_layout()
         sns.jointplot(0, 1, _df, kind='scatter')
-        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+        plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
 
     @staticmethod
@@ -143,7 +141,7 @@ class Plot:
         plt.xticks(rotation=90)
         plt.tight_layout()
         sns.pairplot(_df)
-        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+        plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
 
     @staticmethod
@@ -181,7 +179,7 @@ class Plot:
         plt.xticks(rotation=90)
         plt.tight_layout()
         plt.scatter(_df.iloc[:, _x], _df.iloc[:, _y], c=_df.iloc[:, _c], cmap=colors, s=_s)
-        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+        plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
 
     @staticmethod
@@ -216,7 +214,7 @@ class Plot:
         plt.tight_layout()
         plt.xticks(rotation=90)
         plt.tight_layout()
-        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+        plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
 
     @staticmethod
@@ -242,7 +240,7 @@ class Plot:
         plt.ylabel('Correlation coefficient')
         sm.graphics.tsa.plot_acf(_df.iloc[:, _col], lags=_lag, ax=ax)
         plt.tight_layout()
-        plt.savefig(os.path.join(_output_folder_path, _output_file_name))
+        plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
 
     def plot_all_combination(self, _df: pd.DataFrame, _cols: list, _x: int, _y: int):
         """

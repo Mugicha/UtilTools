@@ -3,7 +3,6 @@ import os
 
 
 class FileOperation:
-
     @staticmethod
     def get_file_list(_input_path: str, _is_recursive: bool = False, _can_return_abspath: bool = False):
         """
@@ -69,11 +68,7 @@ class FileOperation:
         """
         if date_convert:
             my_parser = lambda date: pd.datetime.strptime(date, date_format)
-            #try:
             return pd.read_csv(_path, parse_dates=[date_data_loc], date_parser=my_parser, encoding=self.detect_char_code(_path))
-            #except:
-            #    print('Cannot import csv file or convert time format.')
-            #    exit(1)
         try:
             return pd.read_csv(_path)
         except:
@@ -82,6 +77,12 @@ class FileOperation:
 
     @staticmethod
     def df_to_csv(_df: pd.DataFrame, _path='./UtilTool.csv'):
+        """
+        dataframe を csvとして返す処理。
+        :param _df:
+        :param _path:
+        :return:
+        """
         _df.to_csv(_path, index=False)
 
     @staticmethod
