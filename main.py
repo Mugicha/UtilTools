@@ -5,12 +5,15 @@ from PyQt5.QtCore import pyqtSlot
 
 
 class App(QMainWindow):
+    """
+    MEMO: クラス名の後にあるカッコ内のやつは、継承するクラスを指す
+    """
 
     def __init__(self):
         super().__init__()
         self.title = 'Util Tools for all people.'
-        self.left = 0
-        self.top = 0
+        self.left = 100
+        self.top = 100
         self.width = 400
         self.height = 300
         self.setWindowTitle(self.title)
@@ -30,19 +33,19 @@ class MyTableWidget(QWidget):
 
         # Initialize tab screen
         self.tabs = QTabWidget()
-        self.tab1 = QWidget()
-        self.tab2 = DropWidget()
-        self.tabs.resize(300, 200)
+        self.tab1 = DropWidget()
+        self.tab2 = QWidget()
+        self.tabs.resize(350, 250)
 
         # Add tabs
-        self.tabs.addTab(self.tab1, "Tab 1")
-        self.tabs.addTab(self.tab2, "Tab 2")
+        self.tabs.addTab(self.tab1, "Import")
+        self.tabs.addTab(self.tab2, "Analyse")
 
-        # Create first tab
-        self.tab1.layout = QVBoxLayout(self)
+        # Create button into Analyse tab
+        self.tab2.layout = QVBoxLayout(self)
         self.pushButton1 = QPushButton("PyQt5 button")
-        self.tab1.layout.addWidget(self.pushButton1)
-        self.tab1.setLayout(self.tab1.layout)
+        self.tab2.layout.addWidget(self.pushButton1)
+        self.tab2.setLayout(self.tab2.layout)
 
         # Add tabs to widget        
         self.layout.addWidget(self.tabs)
