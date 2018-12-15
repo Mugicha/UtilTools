@@ -8,8 +8,8 @@ from . import common
 
 class Plot:
 
-    def pure_2d_plot(self,
-                     _df: pd.DataFrame,
+    @staticmethod
+    def pure_2d_plot(_df: pd.DataFrame,
                      _x: int,
                      _y: list,
                      _figsize=(16, 12),
@@ -39,8 +39,8 @@ class Plot:
         plt.close()
         # return plt
 
-    def pure_2d_scatter(self,
-                        _df: pd.DataFrame,
+    @staticmethod
+    def pure_2d_scatter(_df: pd.DataFrame,
                         _x: int,
                         _y: int,
                         _figsize=(16, 12),
@@ -71,8 +71,8 @@ class Plot:
         plt.close()
         # return plt
 
-    def corr_map(self,
-                 _df: pd.DataFrame,
+    @staticmethod
+    def corr_map(_df: pd.DataFrame,
                  _output_folder_path='./',
                  _output_file_name='corr_map.png',
                  _figsize=(16, 12),
@@ -96,8 +96,8 @@ class Plot:
         plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
-    def scatter_with_histogram(self,
-                               _df: pd.DataFrame,
+    @staticmethod
+    def scatter_with_histogram(_df: pd.DataFrame,
                                dim_reduction: bool=False,
                                _figsize: tuple=(16, 12),
                                _output_folder_path: str='./',
@@ -125,8 +125,8 @@ class Plot:
         plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
-    def pair_plot(self,
-                  _df: pd.DataFrame,
+    @staticmethod
+    def pair_plot(_df: pd.DataFrame,
                   _figsize: tuple=(16, 12),
                   _output_folder_path: str='./',
                   _output_file_name: str='pair_plot.png'):
@@ -145,8 +145,8 @@ class Plot:
         plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
-    def scatter_emphasis(self,
-                         _df: pd.DataFrame,
+    @staticmethod
+    def scatter_emphasis(_df: pd.DataFrame,
                          _x: int,
                          _y: int,
                          _c: int,
@@ -183,8 +183,8 @@ class Plot:
         plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
-    def colormap(self,
-                 _df: pd.DataFrame,
+    @staticmethod
+    def colormap(_df: pd.DataFrame,
                  _x: str,
                  _y: str,
                  _z: str,
@@ -218,8 +218,8 @@ class Plot:
         plt.savefig(os.path.join(_output_folder_path, _output_file_name))
         plt.close()
 
-    def show_correlogram(self,
-                         _df: pd.DataFrame,
+    @staticmethod
+    def show_correlogram(_df: pd.DataFrame,
                          _col: int,
                          _lag: int=10,
                          _figsize: tuple=(16, 12),
