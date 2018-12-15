@@ -45,7 +45,8 @@ class Common:
             return None
         return return_ary  # type: list
 
-    def range_check(self, _param, _min, _max):
+    @staticmethod
+    def range_check(_param, _min, _max):
         """
         変数が指定された範囲内にいるか確認する機能
         :param _param:
@@ -58,7 +59,8 @@ class Common:
         else:
             return False
 
-    def folder_check(self, _path):
+    @staticmethod
+    def folder_check(_path):
         """
         フォルダの存在確認をしてくれる機能
         :param _path: 確認したいフォルダのパス
@@ -76,7 +78,8 @@ class Common:
             # print('[folder_check] Exist -> ' + _path)
             return True
 
-    def remove_duplication(self, _list: list):
+    @staticmethod
+    def remove_duplication(_list: list):
         """
         リストの重複を削除する機能
         :param _list: 重複を削除したい配列

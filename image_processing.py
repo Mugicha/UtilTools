@@ -5,7 +5,7 @@ from tqdm import tqdm
 import UtilTools.common
 
 
-class Image_processing():
+class Image_processing:
     def __init__(self):
         self.c = UtilTools.common.Common()
 

@@ -4,7 +4,7 @@ from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
 
-class DataManipulation():
+class DataManipulation:
 
     def ica_reduction(self, _df: pd.DataFrame, _dim: int, _return_with_model=False):
         """

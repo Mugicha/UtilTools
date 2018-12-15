@@ -4,7 +4,7 @@ import mojimoji
 from tqdm import tqdm
 
 
-class NaturalLang():
+class NaturalLang:
 
     def wakachi_mecab(self, _df: pd.DataFrame, _col: str):
             """

@@ -6,7 +6,7 @@ import os
 from . import common
 
 
-class Plot():
+class Plot:
 
     def pure_2d_plot(self,
                      _df: pd.DataFrame,

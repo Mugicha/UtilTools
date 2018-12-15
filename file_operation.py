@@ -2,9 +2,10 @@ import pandas as pd
 import os
 
 
-class FileOperation():
+class FileOperation:
 
-    def get_file_list(self, _input_path: str, _is_recursive: bool = False, _can_return_abspath: bool = False):
+    @staticmethod
+    def get_file_list(_input_path: str, _is_recursive: bool = False, _can_return_abspath: bool = False):
         """
         指定したフォルダの中のファイルリストを作成し、配列として返す機能
         :param _input_path: ファイルリストを取得したいフォルダパス
@@ -44,7 +45,8 @@ class FileOperation():
             print(files)
             return [f for f in files if os.path.isfile(os.path.join(_input_path, f))]
 
-    def detect_char_code(self, _path: str):
+    @staticmethod
+    def detect_char_code(_path: str):
         """
         指定したファイルの文字コードを判別して返す機能
         :param _path: 文字コードを判別したいファイル
@@ -56,7 +58,8 @@ class FileOperation():
             result = chardet.detect(binary)
             return result['encoding']
 
-    def csv_to_df(self, _path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc=0):
+    @staticmethod
+    def csv_to_df(_path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc=0):
         """
         import csv and return the data as DataFrame.
         :param _path: csv path
@@ -78,10 +81,12 @@ class FileOperation():
             print('Cannot import csv file. [' + _path + ']')
             exit(1)
 
-    def df_to_csv(self, _df: pd.DataFrame, _path='./UtilTool.csv'):
+    @staticmethod
+    def df_to_csv(_df: pd.DataFrame, _path='./UtilTool.csv'):
         _df.to_csv(_path, index=False)
 
-    def excel_to_df(self, _input_file: str):
+    @staticmethod
+    def excel_to_df(_input_file: str):
         """
         Excel の読み込み
         :param _input_file: 入力するExcelのファイルパス
@@ -107,7 +112,8 @@ class FileOperation():
             return None
         return row_data
 
-    def df_to_excel(self, _output_file: str, _output_df: pd.DataFrame, _sheet_name='exported'):
+    @staticmethod
+    def df_to_excel(_output_file: str, _output_df: pd.DataFrame, _sheet_name='exported'):
         """
         Excelの書き出し
         :param _output_file: 出力するExcelのファイルパス
@@ -121,7 +127,8 @@ class FileOperation():
             print('Cannot export to excel.')
             exit(1)
 
-    def txt_to_ary(self, _path: str):
+    @staticmethod
+    def txt_to_ary(_path: str):
         """
         対象のファイルを1行ごとに配列に格納してreturnする。
         改行は配列に入れる際に削除される。
@@ -134,7 +141,8 @@ class FileOperation():
                 _list.append(line.replace('\n', ''))
         return _list  # type: list
 
-    def ary_to_txt(self, _list: list, _path: str, _mode: str):
+    @staticmethod
+    def ary_to_txt(_list: list, _path: str, _mode: str):
         """
         list型変数を要素ごとにテキストに書き出す。
         :param _list: 書き出したい配列LIST
