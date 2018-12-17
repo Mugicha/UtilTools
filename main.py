@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QLabel
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
+import UtilTools.file_operation
 
 
 class App(QMainWindow):
@@ -44,28 +45,36 @@ class AnalyseMasterWidget(QWidget):
         # Add tabs
         self.tabs.addTab(self.tab1, "Import")
         self.tabs.addTab(self.tab2, "Analyse")
+        self.tab1.layout = QVBoxLayout(self)
+
+        # For TAB1
+        self.importFileButton = QPushButton("Import File.")
+        self.importFileButton.clicked.connect(self.on_click_importfileBTN)
+        self.tab1.layout.addWidget(self.importFileButton)
+        self.tab1.setLayout(self.tab1.layout)
+
+        # For TAB2
         self.tab2.layout = QVBoxLayout(self)
-
-        # Set label into Analyse tab
-        self.label = QLabel()
-        self.label.setText('None.')
-
-        # Create button into Analyse tab
-        self.pushButton1 = QPushButton("PyQt5 button")
+        self.label2_1 = QLabel()  # Set label into Analyse tab
+        self.label2_1.setText('None.')
+        self.pushButton1 = QPushButton("PyQt5 button")  # Create button into Analyse tab
         self.pushButton1.clicked.connect(self.on_click)
-
-        # Add layout.
-        self.tab2.layout.addWidget(self.label)
+        self.tab2.layout.addWidget(self.label2_1)  # Add layout.
         self.tab2.layout.addWidget(self.pushButton1)
         self.tab2.setLayout(self.tab2.layout)
-
-        # Add tabs to widget        
-        self.layout.addWidget(self.tabs)
+        self.layout.addWidget(self.tabs)  # Add tabs to widget
         self.setLayout(self.layout)
 
     @pyqtSlot()
+    def on_click_importfileBTN(self):
+        print('file name: ' + str(DropWidget.dragged_file))
+        fope = UtilTools.file_operation.FileOperation()
+        self.importDF = fope.excel_to_df(DropWidget.dragged_file)
+        print('Import done.')
+
+    @pyqtSlot()
     def on_click(self):
-        self.label.setText('Clicked.')
+        self.label2_1.setText('Clicked.')
 
 
 class DropWidget(QWidget):
@@ -73,6 +82,7 @@ class DropWidget(QWidget):
     def __init__(self, parent=None):
         super(DropWidget, self).__init__(parent)
         self.setAcceptDrops(True)
+        self.dragged_file = 'None.'
 
     def dragEnterEvent(self, event):
         event.accept()
@@ -91,6 +101,8 @@ class DropWidget(QWidget):
         for mimetype in mimeData.formats():
             print('MIMEType:', mimetype)
             print('Data:', mimeData.data(mimetype))
+            if mimetype == 'text/uri-list':
+                self.dragged_file = str(mimeData.data(mimetype))
             print()
         print()
 
