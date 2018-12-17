@@ -65,10 +65,7 @@ class AnalyseMasterWidget(QWidget):
 
     @pyqtSlot()
     def on_click(self):
-        print("\n")
         self.label.setText('Clicked.')
-        # for currentQTableWidgetItem in self.tableWidget.selectedItems():
-        #     print(currentQTableWidgetItem.row(), currentQTableWidgetItem.column(), currentQTableWidgetItem.text())
 
 
 class DropWidget(QWidget):
