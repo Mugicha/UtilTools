@@ -251,9 +251,9 @@ class Plot:
         :param _y: プロットするときのy軸（番号）
         :return:
         """
-        import UtilTools.common
-        c = UtilTools.common.Common()
+        from . import common
+        c = common.Common()
         combination = c.extract_all_combination(_df, _cols)
         for each_combination in combination:
             _df_extracted = _df[_df[_cols[0] == each_combination[0]] & _df[_cols[1] == each_combination[1]]]
-            self.pure_2d_scatter(_df=_df_extracted, _x=_x, _y=_y)
+            self.pure_2d_scatter(_df=_df_extracted, _x=0, _y=1)
