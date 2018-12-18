@@ -2,9 +2,13 @@ import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
+from scipy import fftpack
+from . import plot
 
 
 class DataManipulation:
+    def __init__(self):
+        self.p = plot.Plot()
 
     def ica_reduction(self, _df: pd.DataFrame, _dim: int, _return_with_model=False):
         """
@@ -39,6 +43,25 @@ class DataManipulation:
             return transformed, pca
         else:
             return transformed
+
+    def simple_fft(self, _input_file: str):
+        """
+        入力値を離散フーリエ変換し、周波数成分に分解する機能
+        :param _input_file:
+        :return:
+        """
+        import matplotlib.pyplot as plt
+        (time, data) = np.loadtxt(_input_file, unpack=True, delimiter=",",
+                                  usecols=(0, 1))  # type: (np.ndarray, np.ndarray)
+        sample_freq = fftpack.fftfreq(data[:].size, d=1)
+        y_fft = fftpack.fft(data[:])
+        pidxs = np.where(sample_freq > 0)
+        freqs, power = sample_freq[pidxs], np.abs(y_fft)[pidxs]
+        plt.figure()
+        plt.plot(freqs, power, 'b-')
+        plt.xlabel("Frequency[Hz]")
+        plt.ylabel("Power")
+        plt.show()
 
     def fill_na(self, _df: pd.DataFrame, _typ: int):
         """

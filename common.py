@@ -92,6 +92,8 @@ class Common:
     def file_exist_check(_file_path):
         """
         ファイルが存在するかどうか確認し、存在するならファイル名の末尾にカウンター文字を付与して返す機能
+        e.g.
+        hoge.txt を_file_pathに入力し、すでにhoge.txtが存在していれば hoge_(1).txtを返す。
         :param _file_path: 存在確認したいファイルパス
         :return: 保存して大丈夫なファイルパス
         """
