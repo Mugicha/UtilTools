@@ -47,9 +47,10 @@ class DataManipulation:
     def simple_fft(self, _input_file: str):
         """
         入力値を離散フーリエ変換し、周波数成分に分解する機能
-        :param _input_file:
-        :return:
+        :param _input_file: 変換したいcsvファイル
+        :return: None
         """
+        # Todo: UtilToolsに合うように、_dfインプットからのpure2dplot連携を実現したい
         import matplotlib.pyplot as plt
         (time, data) = np.loadtxt(_input_file, unpack=True, delimiter=",",
                                   usecols=(0, 1))  # type: (np.ndarray, np.ndarray)
