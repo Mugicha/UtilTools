@@ -69,6 +69,7 @@ class AnalyseMasterWidget(QWidget):
     def on_click_importfileBTN(self):
         print('file name: ' + str(DropWidget.dragged_file))
         fope = UtilTools.file_operation.FileOperation()
+        a = DropWidget.dragged_file
         self.importDF = fope.excel_to_df(DropWidget.dragged_file)
         print('Import done.')
 
@@ -86,25 +87,11 @@ class DropWidget(QWidget):
 
     def dragEnterEvent(self, event):
         event.accept()
-        mimeData = event.mimeData()
-        print('dragEnterEvent')
-        for mimetype in mimeData.formats():
-            print('MIMEType:', mimetype)
-            print('Data:', mimeData.data(mimetype))
-            print()
-        print()
+        pass
 
     def dropEvent(self, event):
         event.accept()
-        mimeData = event.mimeData()
-        print('dropEvent')
-        for mimetype in mimeData.formats():
-            print('MIMEType:', mimetype)
-            print('Data:', mimeData.data(mimetype))
-            if mimetype == 'text/uri-list':
-                self.dragged_file = str(mimeData.data(mimetype))
-            print()
-        print()
+        self.dragged_file = event.mimeData().urls()[0].toString()
 
 
 if __name__ == '__main__':

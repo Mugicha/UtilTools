@@ -8,7 +8,6 @@ class NaturalLang:
 
     def wakachi_mecab(self, _df: pd.DataFrame, _col: str):
             """
-            救急要請概要を事案毎に分かち書きし、品詞情報とともに、辞書型配列で返すもの。
             :param _df: excelデータをDataFrameへ変換したもの。
             :return: dict
             """
