@@ -67,10 +67,10 @@ class AnalyseMasterWidget(QWidget):
 
     @pyqtSlot()
     def on_click_importfileBTN(self):
-        print('file name: ' + str(self.tab1.dragged_file))
+        print('file name: ' + str(DropWidget.dragged_file))
         fope = UtilTools.file_operation.FileOperation()
-        if self.tab1.dragged_file is not None:
-            self.importDF = fope.excel_to_df(self.tab1.dragged_file)
+        a = DropWidget.dragged_file
+        self.importDF = fope.excel_to_df(DropWidget.dragged_file)
         print('Import done.')
 
     @pyqtSlot()
@@ -83,7 +83,7 @@ class DropWidget(QWidget):
     def __init__(self, parent=None):
         super(DropWidget, self).__init__(parent)
         self.setAcceptDrops(True)
-        self.dragged_file = None
+        self.dragged_file = 'None.'
 
     def dragEnterEvent(self, event):
         event.accept()
