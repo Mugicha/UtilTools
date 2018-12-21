@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QLabel
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
-import UtilTools.file_operation
+from . import file_operation
 
 
 class App(QMainWindow):
@@ -68,7 +68,7 @@ class AnalyseMasterWidget(QWidget):
     @pyqtSlot()
     def on_click_importfileBTN(self):
         print('file name: ' + str(DropWidget.dragged_file))
-        fope = UtilTools.file_operation.FileOperation()
+        fope = file_operation.FileOperation()
         a = DropWidget.dragged_file
         self.importDF = fope.excel_to_df(DropWidget.dragged_file)
         print('Import done.')
