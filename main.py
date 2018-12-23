@@ -1,8 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QLabel
-from PyQt5.QtWidgets import QTableWidget,QTableWidgetItem
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 import UtilTools.file_operation
 import pandas as pd
 
@@ -17,8 +16,8 @@ class App(QMainWindow):
         self.title = 'Util Tools for all people.'
         self.left = 100
         self.top = 100
-        self.width = 500
-        self.height = 400
+        self.width = 1000
+        self.height = 800
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
@@ -60,14 +59,16 @@ class AnalyseMasterWidget(QWidget):
 
         # -Define table widget.
         self.tableWidget = QTableWidget()
-        """
-        self.tableWidget.setRowCount(4)
-        self.tableWidget.setColumnCount(2)
-        """
         self.tableWidget.move(0, 0)
+
+        # -Define analyse menu widget.
+        # Todo: create checkbox which select column.
+        self.startAnalyseButton = QPushButton("Analyse.")
+        self.startAnalyseButton.clicked.connect(self.on_click_analyse)
 
         # Add widget to layout
         self.tab2.layout.addWidget(self.tableWidget)
+        self.tab2.layout.addWidget(self.startAnalyseButton)
 
         self.tab2.setLayout(self.tab2.layout)
         self.layout.addWidget(self.tabs)  # Add tabs to widget
@@ -84,15 +85,22 @@ class AnalyseMasterWidget(QWidget):
         self.importDF = fope.excel_to_df(self.tab1.dragged_file)  # type: pd.DataFrame
         print('Import done.')
 
-        # To show dataframe to table widget.
-        self.tableWidget.setRowCount(len(self.importDF))
+        # Show dataframe to table widget.
         self.tableWidget.setColumnCount(len(self.importDF.columns))
+        self.tableWidget.setRowCount(len(self.importDF))
+        self.tableWidget.setHorizontalHeaderLabels(self.importDF.columns)
         for idx, col in enumerate(self.importDF.columns):
-            self.tableWidget.setItem(0, idx, QTableWidgetItem(col))
+            self.tableWidget.setItem(0, idx, QTableWidgetItem(str(self.importDF.iat[0, idx])))
 
     @pyqtSlot()
     def on_click(self):
         self.label2_1.setText('Clicked.')
+
+    @pyqtSlot()
+    def on_click_analyse(self):
+        import UtilTools.qtmodule.analyse_module
+        analyse = UtilTools.qtmodule.analyse_module.Analyse_module()
+        analyse.dataframe_analyse(_df=self.importDF)
 
 
 class DropWidget(QWidget):
