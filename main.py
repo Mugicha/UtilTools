@@ -1,8 +1,10 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QTableWidget,QTableWidgetItem
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 import UtilTools.file_operation
+import pandas as pd
 
 
 class App(QMainWindow):
@@ -15,8 +17,8 @@ class App(QMainWindow):
         self.title = 'Util Tools for all people.'
         self.left = 100
         self.top = 100
-        self.width = 400
-        self.height = 300
+        self.width = 500
+        self.height = 400
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
@@ -54,23 +56,39 @@ class AnalyseMasterWidget(QWidget):
         self.tab1.setLayout(self.tab1.layout)
 
         # For TAB2
-        self.tab2.layout = QVBoxLayout(self)
-        self.label2_1 = QLabel()  # Set label into Analyse tab
-        self.label2_1.setText('None.')
-        self.pushButton1 = QPushButton("PyQt5 button")  # Create button into Analyse tab
-        self.pushButton1.clicked.connect(self.on_click)
-        self.tab2.layout.addWidget(self.label2_1)  # Add layout.
-        self.tab2.layout.addWidget(self.pushButton1)
+        self.tab2.layout = QVBoxLayout(self)  # define tab layout.
+
+        # -Define table widget.
+        self.tableWidget = QTableWidget()
+        """
+        self.tableWidget.setRowCount(4)
+        self.tableWidget.setColumnCount(2)
+        """
+        self.tableWidget.move(0, 0)
+
+        # Add widget to layout
+        self.tab2.layout.addWidget(self.tableWidget)
+
         self.tab2.setLayout(self.tab2.layout)
         self.layout.addWidget(self.tabs)  # Add tabs to widget
         self.setLayout(self.layout)
 
     @pyqtSlot()
     def on_click_importfileBTN(self):
+        """
+        import Excel to Dataframe and show them to Table widget on tab2.
+        :return:
+        """
         print('file name: ' + str(self.tab1.dragged_file))
         fope = UtilTools.file_operation.FileOperation()
-        self.importDF = fope.excel_to_df(self.tab1.dragged_file)
+        self.importDF = fope.excel_to_df(self.tab1.dragged_file)  # type: pd.DataFrame
         print('Import done.')
+
+        # To show dataframe to table widget.
+        self.tableWidget.setRowCount(len(self.importDF))
+        self.tableWidget.setColumnCount(len(self.importDF.columns))
+        for idx, col in enumerate(self.importDF.columns):
+            self.tableWidget.setItem(0, idx, QTableWidgetItem(col))
 
     @pyqtSlot()
     def on_click(self):
@@ -90,7 +108,6 @@ class DropWidget(QWidget):
 
     def dropEvent(self, event):
         event.accept()
-        print('kita')
         self.dragged_file = event.mimeData().urls()[0].toString()
 
 
