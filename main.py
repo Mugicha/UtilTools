@@ -67,10 +67,9 @@ class AnalyseMasterWidget(QWidget):
 
     @pyqtSlot()
     def on_click_importfileBTN(self):
-        print('file name: ' + str(DropWidget.dragged_file))
+        print('file name: ' + str(self.tab1.dragged_file))
         fope = UtilTools.file_operation.FileOperation()
-        a = DropWidget.dragged_file
-        self.importDF = fope.excel_to_df(DropWidget.dragged_file)
+        self.importDF = fope.excel_to_df(self.tab1.dragged_file)
         print('Import done.')
 
     @pyqtSlot()
@@ -91,6 +90,7 @@ class DropWidget(QWidget):
 
     def dropEvent(self, event):
         event.accept()
+        print('kita')
         self.dragged_file = event.mimeData().urls()[0].toString()
 
 
