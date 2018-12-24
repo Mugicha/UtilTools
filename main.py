@@ -59,8 +59,8 @@ class AnalyseMasterWidget(QWidget):
 
         # -Define analyse menu widget.
         self.is_column_selected = [False, False]
-        self.selectedColumn1 = QLabel('[column1]' + self.NOT_DETECT_MSG)
-        self.selectedColumn2 = QLabel('[column2]' + self.NOT_DETECT_MSG)
+        self.selectedColumn1 = QLabel(self.NOT_DETECT_MSG)
+        self.selectedColumn2 = QLabel(self.NOT_DETECT_MSG)
         self.startAnalyseButton = QPushButton("Analyse.")
         self.startAnalyseButton.clicked.connect(self.on_click_analyse)
 
@@ -110,22 +110,22 @@ class AnalyseMasterWidget(QWidget):
         column = self.tableWidget.currentColumn()
         if self.is_column_selected[0] and self.is_column_selected[1]:
             self.is_column_selected[0] = True
-            self.selectedColumn1.setText('[column1]' + self.importDF.columns[column])
+            self.selectedColumn1.setText(self.importDF.columns[column])
             self.is_column_selected[1] = False
-            self.selectedColumn2.setText('[column2]' + self.NOT_DETECT_MSG)
+            self.selectedColumn2.setText(self.NOT_DETECT_MSG)
         elif self.is_column_selected[0] and not self.is_column_selected[1]:
             self.is_column_selected[1] = True
-            self.selectedColumn2.setText('[column2]' + self.importDF.columns[column])
+            self.selectedColumn2.setText(self.importDF.columns[column])
         elif not self.is_column_selected[0] and not self.is_column_selected[1]:
             self.is_column_selected[0] = True
-            self.selectedColumn1.setText('[column1]' + self.importDF.columns[column])
+            self.selectedColumn1.setText(self.importDF.columns[column])
             self.is_column_selected[1] = False
-            self.selectedColumn2.setText('[column2]' + self.NOT_DETECT_MSG)
+            self.selectedColumn2.setText(self.NOT_DETECT_MSG)
         else:
             self.is_column_selected[0] = False
-            self.selectedColumn1.setText('[column1]' + self.NOT_DETECT_MSG)
+            self.selectedColumn1.setText(self.NOT_DETECT_MSG)
             self.is_column_selected[1] = False
-            self.selectedColumn2.setText('[column2]' + self.NOT_DETECT_MSG)
+            self.selectedColumn2.setText(self.NOT_DETECT_MSG)
 
     @pyqtSlot()
     def on_click_analyse(self):
@@ -144,7 +144,7 @@ class AnalyseMasterWidget(QWidget):
                                                     _x=self.columns.index(self.selectedColumn1.text()),
                                                     _y=self.columns.index(self.selectedColumn2.text()),
                                                     _title=self.selectedColumn1.text() + ' vs ' + self.selectedColumn2.text(),
-                                                    _output_folder_path='./',
+                                                    _output_folder_path='./qtmodule/saved/pure_2d_scatter',
                                                     _output_file_name=output_file_path)  # type: QWidget
             self.tabs.addTab(self.result, output_file_path)
             self.setLayout(self.layout)
