@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-import UtilTools.file_operation
-import UtilTools.common
+from . import file_operation
+from . import common
 import pandas as pd
 
 
@@ -85,7 +85,7 @@ class AnalyseMasterWidget(QWidget):
         :return:
         """
         print('file name: ' + str(self.tab1.dragged_file))
-        fope = UtilTools.file_operation.FileOperation()
+        fope = file_operation.FileOperation()
         self.importDF = fope.excel_to_df(self.tab1.dragged_file)  # type: pd.DataFrame
         self.columns = list(self.importDF.columns)  # type: list
         print('Import done.')
@@ -134,8 +134,8 @@ class AnalyseMasterWidget(QWidget):
         新しいタブを生成し、作成したグラフを表示する。
         :return:
         """
-        from UtilTools.qtmodule import analyse_module
-        c = UtilTools.common.Common()
+        from qtmodule import analyse_module
+        c = common.Common()
         if self.is_column_selected[0] and self.is_column_selected[1]:
             output_file_path = c.file_exist_check(self.selectedColumn1.text() + '_vs_' + self.selectedColumn2.text() + '.png')
             analyse = analyse_module.Analyse_module()
