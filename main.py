@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from . import file_operation
-from . import common
+import file_operation
+import common
 import pandas as pd
 
 
