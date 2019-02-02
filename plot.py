@@ -2,8 +2,10 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import seaborn as sns
 import pandas as pd
+import numpy as np
 import os
 from . import common
+from scipy import fftpack
 
 
 class Plot:
@@ -257,3 +259,31 @@ class Plot:
         for each_combination in combination:
             _df_extracted = _df[_df[_cols[0] == each_combination[0]] & _df[_cols[1] == each_combination[1]]]
             self.pure_2d_scatter(_df=_df_extracted, _x=0, _y=1)
+
+    def simple_fft(self, _series: pd.Series,
+                   _output_file_name: str,
+                   _output_folder_path: str,
+                   _title: str,
+                   _figsize: tuple = (16, 12)):
+        """
+        入力値を離散フーリエ変換し、周波数成分でプロットする機能。
+        :param _series: Series to be analysed.
+        :param _output_file_name:
+        :param _output_folder_path:
+        :param _title:
+        :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12))
+        :return: None
+        """
+        data = _series.values  # type: np.ndarray
+        sample_freq = fftpack.fftfreq(data[:].size, d=1)
+        y_fft = fftpack.fft(data[:])
+        pidxs = np.where(sample_freq > 0)
+        freqs, power = sample_freq[pidxs], np.abs(y_fft)[pidxs]
+        plt.figure(figsize=_figsize)
+        plt.title(_title)
+        plt.xlabel("Frequency[Hz]")
+        plt.ylabel("Power")
+        plt.plot(freqs, power, 'b-')
+        plt.tight_layout()
+        plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
+        plt.close()

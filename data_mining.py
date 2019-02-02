@@ -16,7 +16,7 @@ class DataManipulation:
         :param _df: 次元削減したいデータ(DataFrame形式)
         :param _dim: 削減後の次元数
         :param _return_with_model: 主成分分析のモデルもreturnするかどうかのフラグ
-        :return: 主成分分析後のデータフレーム(ndarray)
+        :return: 主成分分析後のndarray
         """
         ica = FastICA(n_components=_dim)  # type: FastICA
         M = np.mean(_df.values, axis=1)[:, np.newaxis]  # type: np.ndarray

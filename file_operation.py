@@ -142,21 +142,60 @@ class FileOperation:
         return _list  # type: list
 
     @staticmethod
-    def ary_to_txt(_list: list, _path: str, _mode: str):
+    def ary_to_txt_1D(_list: list,
+                      _output_file: str,
+                      _mode: str,
+                      _encoding: str = 'utf8'):
         """
         list型変数を要素ごとにテキストに書き出す。
         :param _list: 書き出したい配列LIST
-        :param _path: 書き出し先
+        :param _output_file: 書き出し先
         :param _mode: 書き込みモード（w:書き出し, x:新規作成＆書き込み用に開く, a:末尾に追記）
+        :param _encoding: 書き込み時の文字コード
         :return:
         """
-        with open(_path, _mode) as f:
+        with open(_output_file, _mode, encoding=_encoding) as f:
             f.write('\n'.join(_list))
             f.write('\n')
         f.close()
 
+    @staticmethod
+    def ary_to_txt_2D(_list: list, _output_file: str, _mode: str, _encoding: str = 'utf8'):
+        """
 
-if __name__ == '__main__':
-    f = FileOperation()
-    retu = f.get_file_list(_input_path=r"C:\Users\dainichi.sukita\Documents\01.study\01.AI\06.SIGNATE\01\program", _is_recursive=True, _can_return_abspath=False)
-    print(retu)
+        :param _list: 書き出したい配列LIST（2次元)
+        :param _output_file: 書き出し先ファイルパス
+        :param _mode: 書き込みモード（w:書き出し, x:新規作成＆書き込み用に開く, a:末尾に追記）
+        :param _encoding: 書き込み時の文字コード
+        :return:
+        """
+        if len([len(v) for v in _list]) >= 3:  # return error if the size is more than 3d.
+            print("[ary_to_txt_2D]: Can not export the list. Your list size is " + str([len(v) for v in _list]))
+            return None
+        with open(_output_file, _mode, encoding=_encoding) as f:
+            for l in _list:
+                f.write(','.join(l))
+                f.write('\n')
+        f.close()
+
+    @staticmethod
+    def dic_to_csv(_dic: dict, _output_file: str, _mode: str, _encoding: str = 'utf8'):
+        """
+
+        :param _dic: 書き出したい辞書型配列
+        :param _output_file: 書き出し先ファイルパス
+        :param _mode: 書き込みモード（w:書き出し, x:新規作成＆書き込み用に開く, a:末尾に追記）
+        :param _encoding: 書き込み時の文字コード
+        :return:
+        """
+        if str(type(_dic)) != "<class 'dict'>":
+            print("[dic_to_txt]: Set _dic as dict type.")
+            return None
+        if _output_file.split('.')[-1] != 'csv':
+            print("[dic_to_txt]: Set _output_file as csv file.")
+            return None
+        with open(_output_file, _mode, encoding=_encoding) as f:
+            for key in _dic.keys():
+                f.write(str(key) + ',' + str(_dic[key]))
+                f.write('\n')
+        f.close()
