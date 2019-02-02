@@ -117,8 +117,12 @@ class W2V:
         """
         loss = []  # type: list
         for i in range(_epoch):
-            self.w2v_model.train(self.sentences, _alpha=_alpha, _epoch=1)
-            loss.append(self.w2v_model.get_latest_training_loss())
+            self.w2v_model.train(self.sentences,
+                                 total_examples=len(self.sentences),
+                                 end_alpha=_alpha,
+                                 epochs=1,
+                                 compute_loss=True)
+            loss.append([i, self.w2v_model.get_latest_training_loss()])
         if _return_loss:
             return loss
 
@@ -134,13 +138,14 @@ class W2V:
             return
         self.w2v_model.save(os.path.join(_output_folder, _output_model_name))
 
-    def search_sim_word(self, _word: str):
+    def search_sim_word(self, _word: str, topn: int = 20):
         """
-
+        類似語を検索し、返す機能。
         :param _word:
+        :param topn:
         :return:
         """
         if self.w2v_model is None:
             print("[save_model] W2V model is None.")
             return None
-        return self.w2v_model.most_similar(positive=_word)
+        return self.w2v_model.most_similar(positive=_word, topn=topn)  # type: list

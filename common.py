@@ -102,7 +102,7 @@ class Common:
             name = os.path.basename(_file_path).split('.')
             counter = 1
             cwd = os.getcwd()
-            while os.path.exists(os.path.join(cwd, base, ''.join(name[0:-1]) + '_' + str(counter) + '.' + str(name[-1]))):
+            while os.path.exists(os.path.join(cwd, base, ''.join(name[0:-1]) + '_(' + str(counter) + ').' + str(name[-1]))):
                 counter += 1
             return os.path.join(cwd, base, ''.join(name[0:-1]) + '_(' + str(counter) + ').' + str(name[-1]))
         else:
