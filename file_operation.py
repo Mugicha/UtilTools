@@ -124,8 +124,30 @@ class FileOperation:
         try:
             _output_df.to_excel(_output_file, sheet_name=_sheet_name, index=False)
         except:
-            print('Cannot export to excel.')
-            exit(1)
+            print('[df_to_excel] Cannot export to excel.')
+
+    @staticmethod
+    def multiple_df_to_excel(_output_dir: str, _output_file: str, _output_df_list: list or dict):
+        """
+        DataframeをExcelの複数シートに保存するkに追う
+        :param _output_dir: 保存先のディレクトリパス
+        :param _output_file: 保存するExcelファイル名
+        :param _output_df_list: Dataframeのリストもしくは辞書型変数。リストだとインデックス番号、辞書型の場合はkey名がシート名になる。
+        :return:
+        """
+        from pandas import ExcelWriter
+        try:
+            with ExcelWriter(os.path.join(_output_dir, _output_dir)) as writer:
+                if type(_output_df_list) == "list":
+                    for idx, df in enumerate(_output_df_list):
+                        df.to_excel(writer, 'sheets%s' % idx)
+                        writer.save()
+                elif type(_output_df_list) == 'dict':
+                    for key in _output_df_list.keys():
+                        _output_df_list[key].to_excel(writer, str(key))
+                        writer.save()
+        except:
+            print('[multiple_df_to_excel] Cannot export to excel.')
 
     @staticmethod
     def txt_to_ary(_path: str):
