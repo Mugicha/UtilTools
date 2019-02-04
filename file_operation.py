@@ -41,7 +41,6 @@ class FileOperation:
         # 再帰的に検索しない
         else:
             files = os.listdir(_input_path)
-            print(files)
             return [f for f in files if os.path.isfile(os.path.join(_input_path, f))]
 
     @staticmethod
