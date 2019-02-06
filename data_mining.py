@@ -90,3 +90,6 @@ class DataManipulation:
         :return: NAが削除された後のDataFrame
         """
         return _df.dropna(how='any')
+
+    # def crosstabs(self, _df: pd.DataFrame, _x: int, _y: int, _val: int = None):
+

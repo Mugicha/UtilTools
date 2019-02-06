@@ -57,46 +57,54 @@ class FileOperation:
             result = chardet.detect(binary)
             return result['encoding']
 
-    def csv_to_df(self, _path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc=0):
+    def csv_to_df(self, _path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc: int = 0, header: int = 0):
         """
         import csv and return the data as DataFrame.
         :param _path: csv path
         :param date_convert: convert flag if the data contain date format data.
         :param date_format: date data format e.g. YYYY-mm-dd
         :param date_data_loc: date data column location in csv file.
+        :param header: row num to use column name (default: 0).
         :return: DataFrame
         """
         if date_convert:
             my_parser = lambda date: pd.datetime.strptime(date, date_format)
-            return pd.read_csv(_path, parse_dates=[date_data_loc], date_parser=my_parser, encoding=self.detect_char_code(_path))
+            return pd.read_csv(_path, parse_dates=[date_data_loc],
+                               date_parser=my_parser, encoding=self.detect_char_code(_path), header=header)
         try:
-            return pd.read_csv(_path)
+            return pd.read_csv(_path, header=header)
         except:
             print('Cannot import csv file. [' + _path + ']')
             exit(1)
 
     @staticmethod
-    def df_to_csv(_df: pd.DataFrame, _path='./UtilTool.csv'):
+    def df_to_csv(_df: pd.DataFrame, _output_dir: str = './', _output_file: str = 'UtilTool.csv', _encode: str = 'utf8'):
         """
         dataframe を csvとして返す処理。
         :param _df:
-        :param _path:
+        :param _output_dir:
+        :param _output_file:
+        :param _encode: char encode type (default: utf-8)
         :return:
         """
-        _df.to_csv(_path, index=False)
+        if os.path.splitext(_output_file)[1] != '.csv':
+            print('[df_to_csv] Extension must be csv.')
+            return None
+        _df.to_csv(os.path.join(_output_dir, _output_file), index=False, encoding=_encode)
 
     @staticmethod
-    def excel_to_df(_input_file: str):
+    def excel_to_df(_input_path: str, _encoding: str = 'utf8'):
         """
         Excel の読み込み
-        :param _input_file: 入力するExcelのファイルパス
+        :param _input_path: 入力するExcelのファイルパス
+        :param _encoding: エンコード
         :return: Excelデータを格納したDataFrame(読み込めない場合はNone)
         """
-        if not os.path.splitext(_input_file)[1] in ['.xlsx', '.xls']:
+        if not os.path.splitext(_input_path)[1] in ['.xlsx', '.xls']:
             print('[file_operation.py][excel_to_df] Input file must be xlsx or xls.')
             exit(1)
         try:
-            entire_row_data = pd.ExcelFile(_input_file, encoding='utf8')
+            entire_row_data = pd.ExcelFile(_input_path, encoding=_encoding)
         except:
             return None
         sheet_names = entire_row_data.sheet_names
@@ -113,23 +121,30 @@ class FileOperation:
         return row_data
 
     @staticmethod
-    def df_to_excel(_output_file: str, _output_df: pd.DataFrame, _sheet_name='exported'):
+    def df_to_excel(_df: pd.DataFrame, _output_dir: str = './',
+                    _output_file: str = 'output.xlsx', _sheet_name='exported',
+                    _encoding: str = 'utf8'):
         """
         Excelの書き出し
-        :param _output_file: 出力するExcelのファイルパス
-        :param _output_df: 出力するデータ(DataFrame型)
+        :param _output_dir:
+        :param _output_file: 出力するExcelのファイル名
+        :param _df: 出力するデータ(DataFrame型)
         :param _sheet_name: exportしたexcelのシート名
+        :param _encoding: エクスポート時の文字コード（default: utf-8)
         :return: 終了コード（0:正常, 1:異常）
         """
+        if os.path.splitext(_output_file)[1] != '.xlsx':
+            print('[df_to_excel] Extension must be xlsx.')
+            return None
         try:
-            _output_df.to_excel(_output_file, sheet_name=_sheet_name, index=False)
+            _df.to_excel(_output_file, sheet_name=_sheet_name, index=False, encoding=_encoding)
         except:
             print('[df_to_excel] Cannot export to excel.')
 
     @staticmethod
     def multiple_df_to_excel(_output_dir: str, _output_file: str, _output_df_list: list or dict):
         """
-        DataframeをExcelの複数シートに保存するkに追う
+        DataframeをExcelの複数シートに保存する機能。
         :param _output_dir: 保存先のディレクトリパス
         :param _output_file: 保存するExcelファイル名
         :param _output_df_list: Dataframeのリストもしくは辞書型変数。リストだとインデックス番号、辞書型の場合はkey名がシート名になる。
@@ -203,7 +218,7 @@ class FileOperation:
     @staticmethod
     def dic_to_csv(_dic: dict, _output_file: str, _mode: str, _encoding: str = 'utf8'):
         """
-
+        辞書型配列のkeyとvalueを2列のcsvにして書き出す機能。
         :param _dic: 書き出したい辞書型配列
         :param _output_file: 書き出し先ファイルパス
         :param _mode: 書き込みモード（w:書き出し, x:新規作成＆書き込み用に開く, a:末尾に追記）
