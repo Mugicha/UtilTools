@@ -73,6 +73,38 @@ class Plot:
         # return plt
 
     @staticmethod
+    def simple_histogram(x: list, color: list, xlabel: str = 'xlabel',
+                         _output_file_name: str = 'histogram.png',
+                         bins: int = 10, label: list = None):
+        """
+        ヒストグラムを作成する機能。グラフはbins毎に各ラベル纏めてプロットする。
+        :param x: ヒストグラムを作成したいデータ。複数ラベル分作成したい場合は、list型にまとめること。
+        :param color: グラフの色。複数ラベルある場合は、複数ラベル分纏めてlist型で指定すること。
+        :param xlabel: x軸の名称（default: xlabel）
+        :param _output_file_name: 出力ファイル名（default: ./histogram.png）
+        :param bins: ヒストグラムの分割数（default: 10）
+        :param label: legendで指定する名前。複数ラベル分ある時は、その分list型にまとめて指定する事（default: None）
+        :return:
+        """
+        if len(x) == 0: return
+        if len(color) == 0: return
+        if len(x) != len(color):
+            print('[simplt_histogram] the size of each list x, colo must be same.')
+            return
+        plt.ylabel('count')
+        plt.xlabel(xlabel)
+        if label is None:
+            plt.hist(x, color=color, bins=bins)
+        else:
+            if len(x) != len(label):
+                print('[simple_histogram] the size of each list x, label must be same.')
+                return
+            plt.hist(x, color=color, bins=bins, label=label)
+            plt.legend()
+        plt.savefig(_output_file_name)
+        plt.close()
+
+    @staticmethod
     def corr_map(_df: pd.DataFrame,
                  _output_folder_path='./',
                  _output_file_name='corr_map.png',

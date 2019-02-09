@@ -56,25 +56,30 @@ class FileOperation:
             result = chardet.detect(binary)
             return result['encoding']
 
-    def csv_to_df(self, _path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc: int = 0, header: int = 0):
+    def csv_to_df(self, _path: str, date_convert=False, date_format='YYYY-mm-dd', date_data_loc: int = 0, header=None):
         """
         import csv and return the data as DataFrame.
         :param _path: csv path
         :param date_convert: convert flag if the data contain date format data.
         :param date_format: date data format e.g. YYYY-mm-dd
         :param date_data_loc: date data column location in csv file.
-        :param header: row num to use column name (default: 0).
+        :param header: row num to use column name (default: None which means no header).
         :return: DataFrame
         """
+        ext = os.path.splitext(_path)[1]
+        if not ext in ['.csv', '.tsv']:
+            print('[csv_to_df] Extension must be csv or tsv.')
+            return None
+        sep = ',' if ext == '.csv' else '\t'
         if date_convert:
             my_parser = lambda date: pd.datetime.strptime(date, date_format)
-            return pd.read_csv(_path, parse_dates=[date_data_loc],
+            return pd.read_csv(_path, parse_dates=[date_data_loc], sep=sep,
                                date_parser=my_parser, encoding=self.detect_char_code(_path), header=header)
         try:
-            return pd.read_csv(_path, header=header)
-        except:
+            return pd.read_csv(_path, header=header, sep=sep)
+        except Exception as e:
+            print(e)
             print('Cannot import csv file. [' + _path + ']')
-            exit(1)
 
     @staticmethod
     def df_to_csv(_df: pd.DataFrame, _output_dir: str = './', _output_file: str = 'UtilTool.csv', _encode: str = 'utf8'):
