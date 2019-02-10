@@ -91,5 +91,6 @@ class DataManipulation:
         """
         return _df.dropna(how='any')
 
-    # def crosstabs(self, _df: pd.DataFrame, _x: int, _y: int, _val: int = None):
+    def crosstabs(self, _df: pd.DataFrame, _x: int, _y: int, _val: int = None):
+        return pd.crosstab(_df.iloc[:, _x], _df.iloc[:, _y])
 

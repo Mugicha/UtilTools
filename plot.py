@@ -75,7 +75,7 @@ class Plot:
     @staticmethod
     def simple_histogram(x: list, color: list, xlabel: str = 'xlabel',
                          _output_file_name: str = 'histogram.png',
-                         bins: int = 10, label: list = None):
+                         bins: int = 10, label: list = None, hist_type: str = 'side-by-side'):
         """
         ヒストグラムを作成する機能。グラフはbins毎に各ラベル纏めてプロットする。
         :param x: ヒストグラムを作成したいデータ。複数ラベル分作成したい場合は、list型にまとめること。
@@ -84,6 +84,7 @@ class Plot:
         :param _output_file_name: 出力ファイル名（default: ./histogram.png）
         :param bins: ヒストグラムの分割数（default: 10）
         :param label: legendで指定する名前。複数ラベル分ある時は、その分list型にまとめて指定する事（default: None）
+        :param hist_type: ヒストグラムの描画方法（[default]side-by-side: 各要素横並び、stacked: 各要素を積み上げる）
         :return:
         """
         if len(x) == 0: return
@@ -93,13 +94,14 @@ class Plot:
             return
         plt.ylabel('count')
         plt.xlabel(xlabel)
+        stacked = False if hist_type == 'side-by-side' else True
         if label is None:
-            plt.hist(x, color=color, bins=bins)
+            plt.hist(x, color=color, bins=bins, stacked=stacked)
         else:
             if len(x) != len(label):
                 print('[simple_histogram] the size of each list x, label must be same.')
                 return
-            plt.hist(x, color=color, bins=bins, label=label)
+            plt.hist(x, color=color, bins=bins, label=label, stacked=stacked)
             plt.legend()
         plt.savefig(_output_file_name)
         plt.close()
@@ -183,6 +185,7 @@ class Plot:
                          _x: int,
                          _y: int,
                          _c: int,
+                         _labeldict: dict,
                          _figsize: tuple=(16, 12),
                          _output_folder_path: str='./',
                          _output_file_name: str='scatter_emphasis.png',
@@ -193,26 +196,32 @@ class Plot:
         :param _x: x軸の要素
         :param _y: y軸の要素
         :param _c: 色を変えるラベルとなる要素
+        :param _labeldict: legendに表示するラベル
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12))
         :param _output_folder_path: 保存するフォルダのパス
         :param _output_file_name: 保存する画像ファイル名（デフォルト：scatter_emphasis.png）
         :param _s: size of point.
         :return: None.
         """
-        plt.figure(figsize=_figsize)
-        color_box = ['red', 'm', 'darkorange', 'g', 'c', 'blue', 'darkviolet', 'brown', 'yellow', 'lime']
-        number_of_label = len(common.Common().remove_duplication(_df.iloc[:, _c].values))
-        if number_of_label > 10:
+        # 色の補色関係に従い、順に並べること
+        color_box = ['red', 'green', 'mediumorchid', 'gold', 'blue', 'darkorange', 'cyan']
+
+        # cdict と label を合わせる
+        label = common.Common().remove_duplication(_df.iloc[:, _c].values)
+        if len(label) > len(color_box):
             print('[Warn] The number of label is too large. ' +
-                  'Reduce it less than 10. Or add color to the variable named "color_box" in scatter_emphasis of plot.py.')
-        color_label = color_box[0:number_of_label]
-        colors = ListedColormap(color_label)
-        plt.xlabel(_df.columns.values[_x])
-        plt.ylabel(_df.columns.values[_y])
-        plt.title(_df.columns.values[_c])
-        plt.xticks(rotation=90)
-        plt.tight_layout()
-        plt.scatter(_df.iloc[:, _x], _df.iloc[:, _y], c=_df.iloc[:, _c], cmap=colors, s=_s)
+                  'Reduce it less than ' + str(len(color_box)) +
+                  '. Or add color to the variable named "color_box" in scatter_emphasis of plot.py.')
+        cdict = {}
+        labeldict = {}
+        for idx, c in enumerate(label):
+            cdict[c] = color_box[idx]
+        plt.figure(figsize=_figsize)
+        fig, ax = plt.subplots()
+        for g in np.unique(_df.iloc[:, _c]):
+            ix = np.where(_df.iloc[:, _c] == g)
+            ax.scatter(_df.iloc[:, _x].values[ix], _df.iloc[:, _y].values[ix], c=cdict[g], label=_labeldict[g], s=_s)
+        ax.legend()
         plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
 

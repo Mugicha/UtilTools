@@ -127,7 +127,7 @@ class FileOperation:
     @staticmethod
     def df_to_excel(_df: pd.DataFrame, _output_dir: str = './',
                     _output_file: str = 'output.xlsx', _sheet_name='exported',
-                    _encoding: str = 'utf8'):
+                    _encoding: str = 'utf8', _index: bool=False):
         """
         Excelの書き出し
         :param _output_dir:
@@ -135,13 +135,14 @@ class FileOperation:
         :param _df: 出力するデータ(DataFrame型)
         :param _sheet_name: exportしたexcelのシート名
         :param _encoding: エクスポート時の文字コード（default: utf-8)
+        :param _index: excel出力時にインデックスもexportするかどうか。
         :return: 終了コード（0:正常, 1:異常）
         """
         if os.path.splitext(_output_file)[1] != '.xlsx':
             print('[df_to_excel] Extension must be xlsx.')
             return None
         try:
-            _df.to_excel(_output_file, sheet_name=_sheet_name, index=False, encoding=_encoding)
+            _df.to_excel(os.path.join(_output_dir, _output_file), sheet_name=_sheet_name, index=_index, encoding=_encoding)
         except:
             print('[df_to_excel] Cannot export to excel.')
 
