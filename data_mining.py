@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from scipy import fftpack
 from . import plot
 
@@ -41,6 +42,24 @@ class DataManipulation:
         transformed = pca.fit_transform(_df.values)  # type: np.ndarray
         if _return_with_model:
             return transformed, pca
+        else:
+            return transformed
+
+    def lda_reduction(self, _df: pd.DataFrame, _x: int, _y: int, _dim: int, _return_with_model=False):
+        """
+        LDAによる教師有データの次元削減を行う機能
+        :param _df: 次元削減したいデータ(DataFrame形式)
+        :param _x: 学習データ
+        :param _y: 正解データ
+        :param _dim: 削減後の次元数
+        :param _return_with_model: 主成分分析のモデルもreturnするかどうかのフラグ
+        :return:
+        """
+        lda = LDA(n_components=_dim)  # type: LDA
+        lda.fit(_df.iloc[:, _x].values, _df.iloc[:, _y].values)
+        transformed = lda.fit_transform(_df.values)  # type: np.ndarray
+        if _return_with_model:
+            return transformed, lda
         else:
             return transformed
 
