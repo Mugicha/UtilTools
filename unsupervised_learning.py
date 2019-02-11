@@ -97,7 +97,7 @@ class Agglomerative_Clustering:
         :return:
         """
         ac = AgglomerativeClustering(n_clusters=n_class, affinity='euclidean', linkage='complete')
-        y_ac = ac.fit(_x)
+        y_ac = ac.fit_predict(_x)
         if _concat:
             return np.hstack([_x.values, y_ac.reshape(len(y_ac), 1)])
         else:
@@ -118,7 +118,7 @@ class Dbscan:
         :return:
         """
         db = DBSCAN(eps=_eps, min_samples=_min_samples, metric='euclidean')
-        y_db = db.fit(_x)
+        y_db = db.fit_predict(_x)
         if _concat:
             return np.hstack([_x.values, y_db.reshape(len(y_db), 1)])
         else:
