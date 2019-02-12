@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
+from sklearn.manifold import TSNE
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from scipy import fftpack
 from . import plot
@@ -60,6 +61,23 @@ class DataManipulation:
         transformed = lda.fit_transform(_df.values)  # type: np.ndarray
         if _return_with_model:
             return transformed, lda
+        else:
+            return transformed
+
+    def tsne_reduction(self, _dim: int, _x, _return_with_model: bool):
+        """
+        t-SNEによる次元削減を行う機能
+        :param _dim: 削減後の次元数（t-SNEの場合、2or3次元）
+        :param _x: 次元削減したいデータ（DataFrame形式）
+        :param _return_with_model:
+        :return:
+        """
+        if _dim > 3:
+            print('[Warn][tsne_reduction] It is to be desired that the dimention is 2 or 3.')
+        tsne = TSNE(n_components=_dim)
+        transformed = tsne.fit_transform(_x)
+        if _return_with_model:
+            return transformed, tsne
         else:
             return transformed
 
