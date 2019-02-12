@@ -247,7 +247,7 @@ class Plot:
         plt.figure(figsize=_figsize)
         z = []
         tmp = _df.loc[:, [_x, _y, _z]]
-        for i in range(tmp[_y].min(), tmp[_y].max() + 1):
+        for i in range(int(tmp[_y].min()), int(tmp[_y].max() + 1)):
             z.append(tmp[tmp[_y] == i].sort_values(_x)[_z].values)
         plt.pcolormesh(_df[_x].drop_duplicates().sort_values().values, _df[_y].drop_duplicates().sort_values().values, z, cmap='hsv')
         pp = plt.colorbar(orientation='vertical')
