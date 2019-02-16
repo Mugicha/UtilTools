@@ -5,6 +5,7 @@ import MeCab
 import os
 import mojimoji
 from pyknp import KNP
+from pyknp.knp.knp import KNPTest
 from gensim.models import word2vec
 from tqdm import tqdm
 
@@ -85,8 +86,8 @@ class NaturalLang:
                 f.close()
             return word_dict
 
-    def knp_parsing(self, _sentences):
-        k = KNP(option='-tab')
+    def knp_parsing(self, _sentences: str):
+        k = KNP(option='-tab', jumanpp=False)
         k.parse(_sentences)
 
 
