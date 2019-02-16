@@ -5,7 +5,6 @@ import MeCab
 import os
 import mojimoji
 from pyknp import KNP
-from pyknp.knp.knp import KNPTest
 from gensim.models import word2vec
 from tqdm import tqdm
 
