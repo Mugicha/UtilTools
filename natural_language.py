@@ -4,6 +4,7 @@ import numpy as np
 import MeCab
 import os
 import mojimoji
+from pyknp import KNP
 from gensim.models import word2vec
 from tqdm import tqdm
 
@@ -34,12 +35,11 @@ class NaturalLang:
             # [1]: よみ
             # [2]: 原型？
             # [3]: 品詞
-            print('--- MeCab.')
             m = MeCab.Tagger('-Ochasen')
             item_cnt = 1
-            for each_gaiyo in tqdm(each_item):
+            for each_sentence in tqdm(each_item):
                 gc = str(item_cnt).zfill(6)
-                tmp = m.parse(each_gaiyo).split('\n')
+                tmp = m.parse(each_sentence).split('\n')
                 word_dict[gc] = {}
                 word_cnt = 1
                 for w in tmp:
@@ -67,7 +67,7 @@ class NaturalLang:
                 item_cnt += 1
             # Write csv file to check the result of wakachi-gaki.
             if _export_result_wakachi:
-                with open('./check_hinshi.csv', 'w') as f:
+                with open('../check_hinshi.csv', 'w') as f:
                     import csv
                     w = csv.writer(f)
                     _for = list(word_dict.keys())
@@ -84,6 +84,10 @@ class NaturalLang:
                         w.writerow(_tmph)  # 品詞
                 f.close()
             return word_dict
+
+    def knp_parsing(self, _sentences):
+        k = KNP(option='-tab')
+        k.parse(_sentences)
 
 
 class W2V:
