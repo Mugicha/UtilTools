@@ -213,7 +213,6 @@ class Plot:
                   'Reduce it less than ' + str(len(color_box)) +
                   '. Or add color to the variable named "color_box" in scatter_emphasis of plot.py.')
         cdict = {}
-        labeldict = {}
         for idx, c in enumerate(label):
             cdict[c] = color_box[idx]
         plt.figure(figsize=_figsize)
