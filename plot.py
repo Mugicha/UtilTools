@@ -204,7 +204,7 @@ class Plot:
         :return: None.
         """
         # 色の補色関係に従い、順に並べること
-        color_box = ['red', 'green', 'mediumorchid', 'gold', 'blue', 'darkorange', 'cyan']
+        color_box = ['red', 'green', 'mediumorchid', 'gold', 'blue', 'darkorange', 'cyan', 'purple', 'lime', 'black', 'darkred']
 
         # cdict と label を合わせる
         label = common.Common().remove_duplication(_df.iloc[:, _c].values)
