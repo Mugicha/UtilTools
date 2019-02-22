@@ -131,3 +131,81 @@ class DataManipulation:
     def crosstabs(self, _df: pd.DataFrame, _x: int, _y: int, _val: int = None):
         return pd.crosstab(_df.iloc[:, _x], _df.iloc[:, _y])
 
+
+from edinet_xbrl.edinet_xbrl_parser import EdinetXbrlParser
+
+
+class GetYUHOElementInfo:
+    """
+    有価証券報告のXBRLファイルから
+    必要なラベルの情報だけを取得するクラス
+    Thanks a lot to EdinetXbrlParser !!
+    SUPER Useful !!
+    """
+
+    def __init__(self):
+        """
+        Initialize
+        """
+        self.parser = EdinetXbrlParser()
+        self.edinet_xbrl_object = None
+        self.businessRisks = None
+
+    def get_taxonomy_data(self):
+        """
+        タクソノミデータを取得する処理
+        :return:
+        """
+        pass
+
+    def get_required_element(self):
+        """
+        「XBRLから取得したい要素」を取得する処理
+        :return:
+        """
+        pass
+
+    def parse_xbrl(self, _xbrl_path: str):
+        """
+        Xbrlファイルから何年度のデータかを判別した上で、parseする処理
+        :param _xbrl_path:
+        :return:
+        """
+        # Todo: 読み込むxbrlファイルから、何年度のデータなのかを判別し、適切なタクソノミ情報と突き合わせるコードを書くこと.
+        self.edinet_xbrl_object = self.parser.parse_file(_xbrl_path)
+
+    def get_element_data(self, _key: str, _contextRef: str):
+        """
+        必要な要素を抜き出す処理
+        :param _key:
+        :param _contextRef:
+        :return:
+        """
+        if _contextRef == '':
+            self.businessRisks = self.edinet_xbrl_object.get_data_list(_key)
+        else:
+            self.businessRisks = self.edinet_xbrl_object.get_data_by_context_ref(_key, _contextRef)
+
+    def cleansing(self):
+        """
+        htmlタグを除去する処理.
+        :return:
+        """
+        # Todo: 取得した要素の中のタグ情報を除去する機能を書くこと.
+        pass
+
+    def export_data(self):
+        """
+        CSV形式でデータをエクスポートする処理.
+        :return:
+        """
+        pass
+
+
+if __name__ == '__main__':
+    ufo = GetYUHOElementInfo()
+    # Todo: 企業ごとにxbrlを取得するコードを書くこと.
+    # Todo: 欲しい要素を指定して、それだけ取得する処理もほしい.なんか楽して取れる方法ないかな...
+    xbrl_file_path = r""
+    key = 'jpcrp_cor:BusinessRisksTextBlock'  # 企業等のリスク
+    print(businessRisks[0].get_value())
