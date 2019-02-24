@@ -97,11 +97,12 @@ class FileOperation:
         _df.to_csv(os.path.join(_output_dir, _output_file), index=False, encoding=_encode)
 
     @staticmethod
-    def excel_to_df(_input_path: str, _encoding: str = 'utf8'):
+    def excel_to_df(_input_path: str, _encoding: str = 'utf8', _header: int = 0):
         """
         Excel の読み込み
         :param _input_path: 入力するExcelのファイルパス
         :param _encoding: エンコード
+        :param _header: ヘッダーの行（0スタート)
         :return: Excelデータを格納したDataFrame(読み込めない場合はNone)
         """
         if not os.path.splitext(_input_path)[1] in ['.xlsx', '.xls']:
@@ -113,13 +114,13 @@ class FileOperation:
             return None
         sheet_names = entire_row_data.sheet_names
         if len(sheet_names) == 1:  # シートが1つの時
-            row_data = entire_row_data.parse(sheet_names[0])
+            row_data = entire_row_data.parse(sheet_names[0], header=_header)
         elif len(sheet_names) > 1:  # 複数のシートが存在する場合
             print('シートが複数存在します。読み込むシートの番号を下記から選択してください。')
             for sht_num in range(len(sheet_names)):
                 print(str(sht_num) + ' : ' + sheet_names[sht_num])
             input_sht_num = input('>>> ')
-            row_data = entire_row_data.parse(sheet_names[int(input_sht_num)])
+            row_data = entire_row_data.parse(sheet_names[int(input_sht_num)], header=_header)
         else:
             return None
         return row_data
