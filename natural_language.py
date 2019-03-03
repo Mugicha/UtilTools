@@ -99,7 +99,7 @@ class NaturalLang:
         :return:
         """
         from sklearn.feature_extraction.text import TfidfVectorizer
-        vectorizer = TfidfVectorizer(min_df=0.05)
+        vectorizer = TfidfVectorizer(min_df=_min_df)
         tfidf_x = vectorizer.fit_transform(_corpus).toarray()  # type: np.ndarray
         feature_names = np.array(vectorizer.get_feature_names())
         index = tfidf_x.argsort(axis=1)[:, ::-1]  # np.ndarray
