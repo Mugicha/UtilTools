@@ -89,6 +89,20 @@ class NaturalLang:
         k = KNP(option='-tab', jumanpp=False)
         k.parse(_sentences)
 
+    def tfidf(self, _corpus: list, _min_df: float = 0.03):
+        """
+        TF-IDFによって、特徴語を抽出する機能.
+        :param _corpus: インプットとなるコーパス（type: [ [I like vim] [I like python] ... ]）
+        :param _min_df: 結果として表示するidf値の最小値（default: 0.03）
+        :return:
+        """
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        vectorizer = TfidfVectorizer(min_df=0.05)
+        tfidf_x = vectorizer.fit_transform(_corpus).toarray()  # type: np.ndarray
+        feature_names = np.array(vectorizer.get_feature_names())
+        index = tfidf_x.argsort(axis=1)[:, ::-1]  # np.ndarray
+        feature_words = [feature_names[doc] for doc in index]  # type: list
+        return feature_words  # type: list
 
 class W2V:
     def __init__(self, _sentences):
