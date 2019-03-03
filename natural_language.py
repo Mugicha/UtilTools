@@ -10,80 +10,82 @@ from tqdm import tqdm
 
 
 class NaturalLang:
+    def __init__(self):
+        pass
 
     def wakachi_mecab(self, _df: pd.DataFrame, _col: str, _export_result_wakachi: bool = False):
-            """
-            :param _df: excelデータをDataFrameへ変換したもの。
-            :param _col: _df内の、分かち書きをしたい列名
-            :param _export_result_wakachi: 分かち書きした結果を品詞とともにcsvにエクスポートするかどうか（default: False）
-            :return: dict
-            """
-            word_dict = {}
-            try:
-                each_item = _df[_col].values  # type: np.ndarray
-            except:
-                print('[Warn][wakachi_mecab] 列「' + _col + '」が見つかりません。')
-                return None
-            # 文字列の統一
-            for g in range(len(each_item)):
-                each_item[g] = mojimoji.han_to_zen(str(each_item[g]), kana=False, ascii=False)
-                each_item[g] = each_item[g].replace('(', '（').replace(')', '）')
-            # MeCabで分かち書き
-            # In Ochasen
-            # \t 区切り
-            # [0]: 単語
-            # [1]: よみ
-            # [2]: 原型？
-            # [3]: 品詞
-            m = MeCab.Tagger('-Ochasen')
-            item_cnt = 1
-            for each_sentence in tqdm(each_item):
-                gc = str(item_cnt).zfill(6)
-                tmp = m.parse(each_sentence).split('\n')
-                word_dict[gc] = {}
-                word_cnt = 1
-                for w in tmp:
-                    wc = str(word_cnt).zfill(4)
-                    # 'EOS'対策
-                    try:
-                        w.split('\t')[3]  # EOSだと4要素目は無いのでExceptionが起こる
-                    except IndexError:
-                        continue
-                    word_dict[gc][wc] = {}
-                    try:
-                        # 品詞の登録 for Ochasen
-                        word_dict[gc][wc]['hinshi'] = []
-                        for i in range(4):
-                            try:
-                                word_dict[gc][wc]['hinshi'].append(w.split('\t')[3].split('-')[i])
-                            except IndexError:
-                                word_dict[gc][wc]['hinshi'].append('')
-                        # 単語の登録 for Ochasen
-                        word_dict[gc][wc]['word'] = w.split('\t')[0]
-                        word_cnt += 1
-                    # 'EOS'対策
-                    except:
-                        continue
-                item_cnt += 1
-            # Write csv file to check the result of wakachi-gaki.
-            if _export_result_wakachi:
-                with open('../check_hinshi.csv', 'w') as f:
-                    import csv
-                    w = csv.writer(f)
-                    _for = list(word_dict.keys())
-                    _for.sort()
-                    for i in _for:
-                        _tmpw = []
-                        _tmph = []
-                        _for2 = list(word_dict[i].keys())
-                        _for2.sort()
-                        for j in _for2:
-                            _tmpw.append(word_dict[i][j]['word'])
-                            _tmph.append('-'.join(word_dict[i][j]['hinshi']))
-                        w.writerow(_tmpw)  # word
-                        w.writerow(_tmph)  # 品詞
-                f.close()
-            return word_dict
+        """
+        :param _df: excelデータをDataFrameへ変換したもの。
+        :param _col: _df内の、分かち書きをしたい列名
+        :param _export_result_wakachi: 分かち書きした結果を品詞とともにcsvにエクスポートするかどうか（default: False）
+        :return: dict
+        """
+        word_dict = {}
+        try:
+            each_item = _df[_col].values  # type: np.ndarray
+        except:
+            print('[Warn][wakachi_mecab] 列「' + _col + '」が見つかりません。')
+            return None
+        # 文字列の統一
+        for g in range(len(each_item)):
+            each_item[g] = mojimoji.han_to_zen(str(each_item[g]), kana=False, ascii=False)
+            each_item[g] = each_item[g].replace('(', '（').replace(')', '）')
+        # MeCabで分かち書き
+        # In Ochasen
+        # \t 区切り
+        # [0]: 単語
+        # [1]: よみ
+        # [2]: 原型？
+        # [3]: 品詞
+        m = MeCab.Tagger('-Ochasen')
+        item_cnt = 1
+        for each_sentence in tqdm(each_item):
+            gc = str(item_cnt).zfill(6)
+            tmp = m.parse(each_sentence).split('\n')
+            word_dict[gc] = {}
+            word_cnt = 1
+            for w in tmp:
+                wc = str(word_cnt).zfill(4)
+                # 'EOS'対策
+                try:
+                    w.split('\t')[3]  # EOSだと4要素目は無いのでExceptionが起こる
+                except IndexError:
+                    continue
+                word_dict[gc][wc] = {}
+                try:
+                    # 品詞の登録 for Ochasen
+                    word_dict[gc][wc]['hinshi'] = []
+                    for i in range(4):
+                        try:
+                            word_dict[gc][wc]['hinshi'].append(w.split('\t')[3].split('-')[i])
+                        except IndexError:
+                            word_dict[gc][wc]['hinshi'].append('')
+                    # 単語の登録 for Ochasen
+                    word_dict[gc][wc]['word'] = w.split('\t')[0]
+                    word_cnt += 1
+                # 'EOS'対策
+                except:
+                    continue
+            item_cnt += 1
+        # Write csv file to check the result of wakachi-gaki.
+        if _export_result_wakachi:
+            with open('../check_hinshi.csv', 'w') as f:
+                import csv
+                w = csv.writer(f)
+                _for = list(word_dict.keys())
+                _for.sort()
+                for i in _for:
+                    _tmpw = []
+                    _tmph = []
+                    _for2 = list(word_dict[i].keys())
+                    _for2.sort()
+                    for j in _for2:
+                        _tmpw.append(word_dict[i][j]['word'])
+                        _tmph.append('-'.join(word_dict[i][j]['hinshi']))
+                    w.writerow(_tmpw)  # word
+                    w.writerow(_tmph)  # 品詞
+            f.close()
+        return word_dict
 
     def knp_parsing(self, _sentences: str):
         k = KNP(option='-tab', jumanpp=False)
