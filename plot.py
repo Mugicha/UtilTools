@@ -186,6 +186,7 @@ class Plot:
                          _y: int,
                          _c: int,
                          _labeldict: dict,
+                         _color_box: list=None,
                          _figsize: tuple=(16, 12),
                          _output_folder_path: str='./',
                          _output_file_name: str='scatter_emphasis.png',
@@ -197,6 +198,7 @@ class Plot:
         :param _y: y軸の要素
         :param _c: 色を変えるラベルとなる要素
         :param _labeldict: legendに表示するラベル
+        :param _color_box: a list of color associated with _c.
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12))
         :param _output_folder_path: 保存するフォルダのパス
         :param _output_file_name: 保存する画像ファイル名（デフォルト：scatter_emphasis.png）
@@ -204,7 +206,10 @@ class Plot:
         :return: None.
         """
         # 色の補色関係に従い、順に並べること
-        color_box = ['red', 'green', 'mediumorchid', 'gold', 'blue', 'darkorange', 'cyan', 'purple', 'lime', 'black', 'darkred']
+        if _color_box is None:
+            color_box = ['red', 'green', 'mediumorchid', 'gold', 'blue', 'darkorange', 'cyan', 'purple', 'lime', 'black', 'darkred']
+        else:
+            color_box = _color_box
 
         # cdict と label を合わせる
         label = common.Common().remove_duplication(_df.iloc[:, _c].values)
