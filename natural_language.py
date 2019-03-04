@@ -12,7 +12,7 @@ class NaturalLang:
     def __init__(self):
         pass
 
-    def wakachi_mecab(self, _df: pd.DataFrame, _col: str, _export_result_wakachi: bool = False):
+    def wakachi_mecab(self, _df: pd.DataFrame, _col: str, _export_result_wakachi: bool = False, _export_file_path: str='./export_result_wakachi.csv'):
         """
         :param _df: excelデータをDataFrameへ変換したもの。
         :param _col: _df内の、分かち書きをしたい列名
@@ -68,7 +68,7 @@ class NaturalLang:
             item_cnt += 1
         # Write csv file to check the result of wakachi-gaki.
         if _export_result_wakachi:
-            with open('../check_hinshi.csv', 'w') as f:
+            with open(_export_file_path, 'w') as f:
                 import csv
                 w = csv.writer(f)
                 _for = list(word_dict.keys())
@@ -87,7 +87,7 @@ class NaturalLang:
         return word_dict
 
     def knp_parsing(self, _sentences: str):
-    					from pyknp import KNP
+        from pyknp import KNP
         k = KNP(option='-tab', jumanpp=False)
         k.parse(_sentences)
 
