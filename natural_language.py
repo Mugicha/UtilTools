@@ -21,6 +21,8 @@ class NaturalLang:
         :param _df: excelデータをDataFrameへ変換したもの。
         :param _col: _df内の、分かち書きをしたい列名
         :param _export_result_wakachi: 分かち書きした結果を品詞とともにcsvにエクスポートするかどうか（default: False）
+        :param _export_file_path: file path to be exported.
+        :param _option: MeCab option you wanna use.
         :return: dict
         """
         word_dict = {}
