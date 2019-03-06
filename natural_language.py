@@ -12,7 +12,11 @@ class NaturalLang:
     def __init__(self):
         pass
 
-    def wakachi_mecab(self, _df: pd.DataFrame, _col: str, _export_result_wakachi: bool = False, _export_file_path: str='./export_result_wakachi.csv'):
+    def wakachi_mecab(self,
+                      _df: pd.DataFrame,
+                      _col: str, _export_result_wakachi: bool = False,
+                      _export_file_path: str='./export_result_wakachi.csv',
+                      _option: str = None):
         """
         :param _df: excelデータをDataFrameへ変換したもの。
         :param _col: _df内の、分かち書きをしたい列名
@@ -36,7 +40,8 @@ class NaturalLang:
         # [1]: よみ
         # [2]: 原型？
         # [3]: 品詞
-        m = MeCab.Tagger('-Ochasen')
+        option = '-Ochasen' if _option is None else '-Ochasen ' + _option
+        m = MeCab.Tagger(option)
         item_cnt = 1
         for each_sentence in tqdm(each_item):
             gc = str(item_cnt).zfill(6)
