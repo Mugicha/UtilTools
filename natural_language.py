@@ -6,6 +6,8 @@ import os
 import mojimoji
 from gensim.models import word2vec
 from tqdm import tqdm
+from gensim.models.doc2vec import Doc2Vec
+from gensim.models.doc2vec import TaggedDocument
 
 
 class NaturalLang:
@@ -176,3 +178,24 @@ class W2V:
             print("[save_model] W2V model is None.")
             return None
         return self.w2v_model.most_similar(positive=_word, topn=topn)  # type: list
+
+class D2V:
+    def __init__(self):
+        self.m = None
+
+    def train(self, trainings):
+        self.m = Doc2Vec(documents=trainings, dm=1, size=300, window=8, min_count=10, workers=4)
+
+    def save_model(self, _save_path):
+        """
+        Doc2Vecのモデルを保存する処理。
+        :param _save_path: 保存するファイルパス
+        :return:
+        """
+        self.m.save(_save_path)
+
+    def load_model(self, _load_path):
+        self.m = Doc2Vec.load(_load_path)
+
+    def search_sim_word(self):
+        pass
