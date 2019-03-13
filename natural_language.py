@@ -118,7 +118,7 @@ class NaturalLang:
 class W2V:
     def __init__(self, _sentences):
         """
-        :param _sentences: 学習に使うコーパス
+        :param _sentences: 学習に使うコーパス [['I', 'like', 'python'], ['You', 'like', 'python']...]
         """
         self.w2v_model = None
         self.sentences = _sentences
@@ -179,12 +179,50 @@ class W2V:
             return None
         return self.w2v_model.most_similar(positive=_word, topn=topn)  # type: list
 
-class D2V:
-    def __init__(self):
-        self.m = None
 
-    def train(self, trainings):
-        self.m = Doc2Vec(documents=trainings, dm=1, size=300, window=8, min_count=10, workers=4)
+class D2V:
+    def __init__(self, _sentences):
+        self.d2v_model = None
+        self.sentences = [TaggedDocument(doc, [i]) for i, doc in enumerate(_sentences)]
+
+    def create_model(self, _dm: int=1, _size: int=300, _window: int=8, _min_count: int=10, _workers: int=4):
+        """
+        Doc2Vecのモデルを生成する機能
+        :param _dm: training algorithm. 1 means 'distributed memory'. otherwise, 'distributed bag-of-words'
+        :param _size: vector size of model.
+        :param _window:
+        :param _min_count:
+        :param _workers: Use these many worker threads to train the model (=faster training with multi-core machines).
+        :return:
+        """
+        self.d2v_model = Doc2Vec(documents=self.sentences,
+                                 dm=_dm,
+                                 size=_size,
+                                 window=_window,
+                                 min_count=_min_count,
+                                 workers=_workers)  # type: Doc2Vec
+
+    def train(self, _epoch: int, _alpha: float = 0.0001, _return_loss: bool = False):
+        """
+        create_modelで生成したモデルを学習させる機能
+        :param _epoch:
+        :param _alpha: initial learning rate.
+        :param _return_loss: 損失関数の推移を返すかどうか
+        :return:
+        """
+        if self.d2v_model is None:
+            print('[D2V] model is empty.')
+            return None
+        loss = []  # type: list
+        for i in range(_epoch):
+            self.d2v_model.train(self.sentences,
+                                 total_examples=len(self.sentences),
+                                 end_alpha=_alpha,
+                                 epochs=1,
+                                 compute_loss=True)
+            loss.append([i, self.d2v_model.get_latest_training_loss()])
+        if _return_loss:
+            return loss
 
     def save_model(self, _save_path):
         """
@@ -192,10 +230,13 @@ class D2V:
         :param _save_path: 保存するファイルパス
         :return:
         """
-        self.m.save(_save_path)
+        if self.d2v_model is None:
+            print('[D2V] model is empty.')
+            return None
+        self.d2v_model.save(_save_path)
 
     def load_model(self, _load_path):
-        self.m = Doc2Vec.load(_load_path)
+        self.d2v_model = Doc2Vec.load(_load_path)
 
     def search_sim_word(self):
         pass
