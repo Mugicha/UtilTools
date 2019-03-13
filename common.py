@@ -3,6 +3,15 @@ import pandas as pd
 
 
 class Common:
+    @staticmethod
+    def nowtime():
+        """
+        今の時間をstr形式で返すだけの関数
+        :return:
+        """
+        from datetime import datetime
+        return str(datetime.now().strftime('%Y%m%d%H%M%S'))
+
     def extract_all_combination(self, _df: pd.DataFrame, _combination_pare_column: list):
         """
         データフレームの指定した列内に出現する値の総組合せを配列で返す機能。
