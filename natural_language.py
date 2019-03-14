@@ -235,5 +235,9 @@ class D2V:
     def load_model(self, _load_path):
         self.d2v_model = Doc2Vec.load(_load_path)
 
-    def search_sim_word(self):
-        pass
+    def search_sim_word(self, word1, word2):
+        if self.d2v_model is None:
+            print('[D2V] model is empty.')
+            return None
+        return self.d2v_model.similarity(word1, word2)
+

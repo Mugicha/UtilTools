@@ -241,3 +241,18 @@ class FileOperation:
                 f.write(str(key) + ',' + str(_dic[key]))
                 f.write('\n')
         f.close()
+
+    def excel_to_dic(self, _input_excel_file_path: str):
+        """
+        excelの1列目をkey, 2列目をValueとしてdictionaryに変換する機能
+        :param _input_excel_file_path:
+        :return:
+        """
+        if os.path.splitext(_input_excel_file_path)[1] != '.xlsx':
+            print('[df_to_excel] Extension must be xlsx.')
+            return None
+        df = self.excel_to_df(_input_excel_file_path)
+        dic = {}
+        for idx, row in df.iterrows():
+            dic[row.iloc[0]] = row.iloc[1]
+        return dic
