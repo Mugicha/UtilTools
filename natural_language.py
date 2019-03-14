@@ -199,30 +199,27 @@ class D2V:
                                  dm=_dm,
                                  size=_size,
                                  window=_window,
+                                 alpha=0.025,
+                                 min_alpha=0.025,
                                  min_count=_min_count,
-                                 workers=_workers)  # type: Doc2Vec
+                                 workers=_workers,
+                                 compute_loss=True)  # type: Doc2Vec
 
-    def train(self, _epoch: int, _alpha: float = 0.0001, _return_loss: bool = False):
+    def train(self, _epoch: int):
         """
-        create_modelで生成したモデルを学習させる機能
+        create_modelで生成したモデルを学習させる機能 loss計算機能はまだないらしい
         :param _epoch:
-        :param _alpha: initial learning rate.
-        :param _return_loss: 損失関数の推移を返すかどうか
         :return:
         """
         if self.d2v_model is None:
             print('[D2V] model is empty.')
             return None
-        loss = []  # type: list
-        for i in range(_epoch):
+        for i in tqdm(range(_epoch)):
+            print('now alpha : ' + str(self.d2v_model.alpha))
             self.d2v_model.train(self.sentences,
                                  total_examples=len(self.sentences),
-                                 end_alpha=_alpha,
-                                 epochs=1,
-                                 compute_loss=True)
-            loss.append([i, self.d2v_model.get_latest_training_loss()])
-        if _return_loss:
-            return loss
+                                 epochs=1)
+            self.d2v_model.alpha -= (0.025 - 0.0001)/_epoch
 
     def save_model(self, _save_path):
         """
