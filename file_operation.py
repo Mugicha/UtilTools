@@ -97,11 +97,10 @@ class FileOperation:
         _df.to_csv(os.path.join(_output_dir, _output_file), index=False, encoding=_encode)
 
     @staticmethod
-    def excel_to_df(_input_path: str, _encoding: str = 'utf8', _header: int = 0):
+    def excel_to_df(_input_path: str, _header: int = 0):
         """
         Excel の読み込み
         :param _input_path: 入力するExcelのファイルパス
-        :param _encoding: エンコード
         :param _header: ヘッダーの行（0スタート)
         :return: Excelデータを格納したDataFrame(読み込めない場合はNone)
         """
@@ -109,7 +108,7 @@ class FileOperation:
             print('[file_operation.py][excel_to_df] Input file must be xlsx or xls.')
             exit(1)
         try:
-            entire_row_data = pd.ExcelFile(_input_path, encoding=_encoding)
+            entire_row_data = pd.ExcelFile(_input_path)
         except:
             return None
         sheet_names = entire_row_data.sheet_names
