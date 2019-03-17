@@ -6,30 +6,31 @@ import os
 import mojimoji
 from gensim.models import word2vec
 from tqdm import tqdm
+from multiprocessing import Pool
 from gensim.models.doc2vec import Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
 
 
 class NaturalLang:
-    def __init__(self):
+    def __init__(self, num_to_exec_multithread: int = 5000):
+        self.num_to_exec_multithread = num_to_exec_multithread
+        self.wakachi_result_for_multiprocess = {}
         pass
 
-    def wakachi_mecab(self,
-                      _df: pd.DataFrame,
-                      _col: str, _export_result_wakachi: bool = False,
-                      _export_file_path: str='./export_result_wakachi.csv',
-                      _option: str = None):
+    def do_wakachi(self, args: list):
         """
-        :param _df: excelデータをDataFrameへ変換したもの。
-        :param _col: _df内の、分かち書きをしたい列名
-        :param _export_result_wakachi: 分かち書きした結果を品詞とともにcsvにエクスポートするかどうか（default: False）
-        :param _export_file_path: file path to be exported.
-        :param _option: MeCab option you wanna use.
-        :return: dict
+        分かち書きの処理を行う機能
+        :param args: 引数を纏めたリスト[0]: MeCabのオプション、[1]: 分かち書き結果のdict変数の開始キー、[2]: 分かち書き対象のSeries.
+        :return:
         """
+        _out_num = args[0]
+        _option = args[1]
+        _item_count = args[2]
+        df = args[3]
+        _col = args[4]
         word_dict = {}
         try:
-            each_item = _df[_col].values  # type: np.ndarray
+            each_item = df[_col].values  # type: np.ndarray
         except:
             print('[Warn][wakachi_mecab] 列「' + _col + '」が見つかりません。')
             return None
@@ -46,7 +47,8 @@ class NaturalLang:
         # [3]: 品詞
         option = '-Ochasen' if _option is None else '-Ochasen ' + _option
         m = MeCab.Tagger(option)
-        item_cnt = 1
+        item_cnt = _item_count
+        print('start')
         for each_sentence in tqdm(each_item):
             gc = str(item_cnt).zfill(6)
             tmp = m.parse(each_sentence).split('\n')
@@ -75,6 +77,44 @@ class NaturalLang:
                 except:
                     continue
             item_cnt += 1
+        return [_out_num, word_dict]
+
+    def wakachi_mecab(self,
+                      _df: pd.DataFrame,
+                      _col: str, _export_result_wakachi: bool = False,
+                      _export_file_path: str='./export_result_wakachi.csv',
+                      _option: str = None):
+        """
+        :param _df: excelデータをDataFrameへ変換したもの。
+        :param _col: _df内の、分かち書きをしたい列名
+        :param _export_result_wakachi: 分かち書きした結果を品詞とともにcsvにエクスポートするかどうか（default: False）
+        :param _export_file_path: file path to be exported.
+        :param _option: MeCab option you wanna use.
+        :return: dict
+        """
+        # 分かち書きするデータ数が100未満なら、シングルコアで処理する
+        total_num_of_exec = len(_df)
+        if total_num_of_exec < 100:
+            word_dict = self.do_wakachi(args=[0, _option, 1, _df, "Summary"])[1]
+        # multiprocess で分かち書き
+        else:
+            word_dict = {}
+            num_of_thread = 3
+            p = Pool(num_of_thread)
+            q, mod = divmod(len(_df), num_of_thread)
+            args = []
+            for i in range(num_of_thread):
+                if i == num_of_thread - 1:
+                    args.append([i, _option, q * i + 1, _df.iloc[q*i:q*(i + 1)+mod, :].reset_index(drop=True), "Summary"])
+                else:
+                    args.append([i, _option, q*i+1, _df.iloc[q*i:q*(i+1), :].reset_index(drop=True), "Summary"])
+            word_dicts = p.map(self.do_wakachi, args)
+            p.close()
+            for wd in word_dicts:
+                self.wakachi_result_for_multiprocess[wd[0]] = wd[1]
+            for i in range(num_of_thread):
+                word_dict.update(self.wakachi_result_for_multiprocess[i])
+
         # Write csv file to check the result of wakachi-gaki.
         if _export_result_wakachi:
             with open(_export_file_path, 'w') as f:
@@ -114,6 +154,7 @@ class NaturalLang:
         index = tfidf_x.argsort(axis=1)[:, ::-1]  # np.ndarray
         feature_words = [feature_names[doc] for doc in index]  # type: list
         return feature_words  # type: list
+
 
 class W2V:
     def __init__(self, _sentences):
@@ -241,3 +282,10 @@ class D2V:
             return None
         return self.d2v_model.similarity(word1, word2)
 
+
+if __name__ == '__main__':
+    from UtilTools import file_operation
+    fope = file_operation.FileOperation()
+    df = fope.excel_to_df(r"C:\Users\dainichi.sukita\Documents\01.study\01.AI\04.NLP\AnalyseAnnualReport\01.data\feature_word_of_news\news.xlsx")
+    nl = NaturalLang()
+    nl.wakachi_mecab(_df=df, _col='Summary')
