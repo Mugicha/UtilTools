@@ -12,7 +12,7 @@ from gensim.models.doc2vec import TaggedDocument
 
 
 class NaturalLang:
-    def __init__(self, num_to_exec_multithread: int = 5000):
+    def __init__(self, num_to_exec_multithread: int = 3):
         self.num_to_exec_multithread = num_to_exec_multithread
         self.wakachi_result_for_multiprocess = {}
         pass
