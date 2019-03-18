@@ -286,6 +286,6 @@ class D2V:
 if __name__ == '__main__':
     from UtilTools import file_operation
     fope = file_operation.FileOperation()
-    df = fope.excel_to_df(r"C:\Users\dainichi.sukita\Documents\01.study\01.AI\04.NLP\AnalyseAnnualReport\01.data\feature_word_of_news\news.xlsx")
+    df = fope.excel_to_df()
     nl = NaturalLang()
     nl.wakachi_mecab(_df=df, _col='Summary')
