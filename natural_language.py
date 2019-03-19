@@ -19,7 +19,7 @@ class NaturalLang:
 
     def do_wakachi(self, args: list):
         """
-        分かち書きの処理を行う機能
+        分かち書きの処理を行う機能(multi_threadとして呼び出される側の関数)
         :param args: 引数を纏めたリスト[0]: MeCabのオプション、[1]: 分かち書き結果のdict変数の開始キー、[2]: 分かち書き対象のSeries.
         :return:
         """
@@ -95,7 +95,7 @@ class NaturalLang:
         # 分かち書きするデータ数が100未満なら、シングルコアで処理する
         total_num_of_exec = len(_df)
         if total_num_of_exec < 100:
-            word_dict = self.do_wakachi(args=[0, _option, 1, _df, "Summary"])[1]
+            word_dict = self.do_wakachi(args=[0, _option, 1, _df, _col])[1]
         # multiprocess で分かち書き
         else:
             word_dict = {}
@@ -105,9 +105,9 @@ class NaturalLang:
             args = []
             for i in range(num_of_thread):
                 if i == num_of_thread - 1:
-                    args.append([i, _option, q * i + 1, _df.iloc[q*i:q*(i + 1)+mod, :].reset_index(drop=True), "Summary"])
+                    args.append([i, _option, q * i + 1, _df.iloc[q*i:q*(i + 1)+mod, :].reset_index(drop=True), _col])
                 else:
-                    args.append([i, _option, q*i+1, _df.iloc[q*i:q*(i+1), :].reset_index(drop=True), "Summary"])
+                    args.append([i, _option, q*i+1, _df.iloc[q*i:q*(i+1), :].reset_index(drop=True), _col])
             word_dicts = p.map(self.do_wakachi, args)
             p.close()
             for wd in word_dicts:
@@ -134,6 +134,55 @@ class NaturalLang:
                     w.writerow(_tmph)  # 品詞
             f.close()
         return word_dict
+
+    def create_histogram(self, _df: pd.DataFrame, _column: str, _typ: str, _ext_hinshi: list=['一般', '固有名詞']):
+            """
+            ヒストグラムを作成する。
+            :param _df:
+            :param _column:
+            :param _typ: meishi, or all
+            :param _ext_hinshi:
+            :return:
+            """
+            import collections
+            _word_box = []
+            count = 0
+            print('[Info] Start to import file.')
+            gaiyo = _df[_column].values  # type: np.ndarray
+            # 文字列の統一
+            for g in range(len(gaiyo)):
+                import mojimoji
+                gaiyo[g] = mojimoji.han_to_zen(str(gaiyo[g]), kana=False, ascii=False)  # 半角→全角
+                gaiyo[g] = gaiyo[g].replace('(', '（').replace(')', '）')  # 半角カッコを全角に統一する
+            print('[Info] Start to create histogram.')
+            m = MeCab.Tagger('-u ../../../03.data/mecab-user-dict-seed.20181022.dic')
+            for i in tqdm(gaiyo):
+                count += len(i.split(' '))
+                if _typ == 'meishi':
+                    _word_info = i.split(' ')
+                    for _each_word in _word_info:
+                        if _each_word == '': continue
+                        _w = m.parse(_each_word).split('\n')[0:-2]
+                        hinshi = _w[0].split('\t')[1]
+                        if hinshi.split(',')[0] == '名詞':
+                            type1 = hinshi.split(',')[1]
+                            if type1 in _ext_hinshi:
+                                _word_box.append(_w[0].split('\t')[0])
+                elif _typ == 'all':
+                    _word_info = i.split(' ')  # MeCab default dic
+                    _word_box.extend(_word_info)
+                else:
+                    print('invalid type.')
+
+            cnt = collections.Counter(_word_box)
+            # count words.
+            cnt_df = pd.DataFrame.from_dict(cnt, orient='index')  # convert Counter to DataFrame
+            cnt_df = cnt_df.rename(columns={0: 'count'})  # rename columns
+            cnt_df = cnt_df.sort_values('count', ascending=False)  # sort in descending order
+            f_brackets = lambda x: x / count
+            cnt_df_2 = cnt_df.iloc[:, 0].map(f_brackets)
+            output_df = pd.concat([cnt_df, cnt_df_2], axis=1, sort=False)
+            return output_df
 
     def knp_parsing(self, _sentences: str):
         from pyknp import KNP
