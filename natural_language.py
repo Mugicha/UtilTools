@@ -155,7 +155,7 @@ class NaturalLang:
                 gaiyo[g] = mojimoji.han_to_zen(str(gaiyo[g]), kana=False, ascii=False)  # 半角→全角
                 gaiyo[g] = gaiyo[g].replace('(', '（').replace(')', '）')  # 半角カッコを全角に統一する
             print('[Info] Start to create histogram.')
-            m = MeCab.Tagger('-u ../../../03.data/mecab-user-dict-seed.20181022.dic')
+            m = MeCab.Tagger()
             for i in tqdm(gaiyo):
                 count += len(i.split(' '))
                 if _typ == 'meishi':
