@@ -181,7 +181,7 @@ class NaturalLang:
             cnt_df = cnt_df.sort_values('count', ascending=False)  # sort in descending order
             f_brackets = lambda x: x / count
             cnt_df_2 = cnt_df.iloc[:, 0].map(f_brackets)
-            output_df = pd.concat([cnt_df, cnt_df_2], axis=1, sort=False)
+            output_df = pd.concat([cnt_df, cnt_df_2], axis=1)
             return output_df
 
     def knp_parsing(self, _sentences: str):
