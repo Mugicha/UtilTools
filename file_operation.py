@@ -145,6 +145,7 @@ class FileOperation:
             _df.to_excel(os.path.join(_output_dir, _output_file), sheet_name=_sheet_name, index=_index, encoding=_encoding)
         except:
             print('[df_to_excel] Cannot export to excel.')
+            exit(0)
 
     @staticmethod
     def multiple_df_to_excel(_output_dir: str, _output_file: str, _output_df_list: list or dict):
