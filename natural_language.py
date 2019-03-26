@@ -204,6 +204,11 @@ class NaturalLang:
         feature_words = [feature_names[doc] for doc in index]  # type: list
         return feature_words  # type: list
 
+    def bm25(self, _corpus: list):
+        from gensim.summarization.bm25 import get_bm25_weights
+        result = get_bm25_weights(_corpus)
+
+
 
 class W2V:
     def __init__(self, _sentences):
