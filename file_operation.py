@@ -107,10 +107,7 @@ class FileOperation:
         if not os.path.splitext(_input_path)[1] in ['.xlsx', '.xls']:
             print('[file_operation.py][excel_to_df] Input file must be xlsx or xls.')
             exit(1)
-        try:
-            entire_row_data = pd.ExcelFile(_input_path)
-        except:
-            return None
+        entire_row_data = pd.ExcelFile(_input_path)
         sheet_names = entire_row_data.sheet_names
         if len(sheet_names) == 1:  # シートが1つの時
             row_data = entire_row_data.parse(sheet_names[0], header=_header)
