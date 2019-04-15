@@ -155,12 +155,13 @@ class FileOperation:
         """
         from pandas import ExcelWriter
         try:
-            with ExcelWriter(os.path.join(_output_dir, _output_dir)) as writer:
-                if type(_output_df_list) == "list":
+            with ExcelWriter(os.path.join(_output_dir, _output_file)) as writer:
+                print(type(_output_df_list))
+                if "list" in str(type(_output_df_list)):
                     for idx, df in enumerate(_output_df_list):
                         df.to_excel(writer, 'sheets%s' % idx)
                         writer.save()
-                elif type(_output_df_list) == 'dict':
+                elif 'dict' in str(type(_output_df_list)):
                     for key in _output_df_list.keys():
                         _output_df_list[key].to_excel(writer, str(key))
                         writer.save()

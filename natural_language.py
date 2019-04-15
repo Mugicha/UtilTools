@@ -135,13 +135,14 @@ class NaturalLang:
             f.close()
         return word_dict
 
-    def create_histogram(self, _df: pd.DataFrame, _column: str, _typ: str, _ext_hinshi: list=['一般', '固有名詞']):
+    def create_histogram(self, _df: pd.DataFrame, _column: str, _typ: str, _ext_hinshi: list=['一般', '固有名詞'], _op = None):
             """
             ヒストグラムを作成する。
             :param _df:
             :param _column:
             :param _typ: meishi, or all
             :param _ext_hinshi:
+            :param _op: MeCab option if needed.
             :return:
             """
             import collections
@@ -155,7 +156,10 @@ class NaturalLang:
                 gaiyo[g] = mojimoji.han_to_zen(str(gaiyo[g]), kana=False, ascii=False)  # 半角→全角
                 gaiyo[g] = gaiyo[g].replace('(', '（').replace(')', '）')  # 半角カッコを全角に統一する
             print('[Info] Start to create histogram.')
-            m = MeCab.Tagger()
+            if _op is not None:
+                m = MeCab.Tagger(_op)
+            else:
+                m = MeCab.Tagger()
             for i in tqdm(gaiyo):
                 count += len(i.split(' '))
                 if _typ == 'meishi':
@@ -335,11 +339,3 @@ class D2V:
             print('[D2V] model is empty.')
             return None
         return self.d2v_model.similarity(word1, word2)
-
-
-if __name__ == '__main__':
-    from UtilTools import file_operation
-    fope = file_operation.FileOperation()
-    df = fope.excel_to_df()
-    nl = NaturalLang()
-    nl.wakachi_mecab(_df=df, _col='Summary')
