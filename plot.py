@@ -226,6 +226,8 @@ class Plot:
             ix = np.where(_df.iloc[:, _c] == g)
             ax.scatter(_df.iloc[:, _x].values[ix], _df.iloc[:, _y].values[ix], c=cdict[g], label=_labeldict[g], s=_s)
         ax.legend()
+        plt.xticks(rotation=90)
+        plt.tight_layout()
         plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
 
