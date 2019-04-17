@@ -131,3 +131,17 @@ class DataManipulation:
     def crosstabs(self, _df: pd.DataFrame, _x: int, _y: int, _val: int = None):
         return pd.crosstab(_df.iloc[:, _x], _df.iloc[:, _y])
 
+    def moving_avg(self, _df: pd.DataFrame, _column: str, _window: int = 3):
+        """
+        移動平均を算出し、列を追加して返す処理.
+        :param _df:
+        :param _column:
+        :param _window:
+        :return:
+        """
+        ma_series = _df[_column].rolling(_window).mean()
+        concat_df = pd.concat([_df, pd.DataFrame(ma_series.T)], axis=1)
+        new_col = list(_df.columns)
+        new_col.append(_column + '_ma')
+        concat_df.columns = new_col
+        return concat_df

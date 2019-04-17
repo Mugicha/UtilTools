@@ -290,6 +290,7 @@ class Plot:
         sm.graphics.tsa.plot_acf(_df.iloc[:, _col], lags=_lag, ax=ax)
         plt.tight_layout()
         plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
+        plt.close()
 
     def plot_all_combination(self, _df: pd.DataFrame, _cols: list, _x: int, _y: int):
         """
