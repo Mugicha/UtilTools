@@ -131,15 +131,32 @@ class DataManipulation:
     def crosstabs(self, _df: pd.DataFrame, _x: int, _y: int, _val: int = None):
         return pd.crosstab(_df.iloc[:, _x], _df.iloc[:, _y])
 
-    def moving_avg(self, _df: pd.DataFrame, _column: str, _window: int = 3):
+    def moving_avg(self, _df: pd.DataFrame, _column: str, _typ: str = 'behind', _window: int = 3):
         """
         移動平均を算出し、列を追加して返す処理.
         :param _df:
         :param _column:
+        :param _typ: "behind" or "center". "behind" is default value.
         :param _window:
         :return:
         """
-        ma_series = _df[_column].rolling(_window).mean()
+        if _typ == 'behind':
+            ma_series = _df[_column].rolling(_window).mean()
+        elif _typ == 'center':
+            if _window % 2 == 1:
+                _tmp_ma_ndary = _df[_column].values
+                ave = np.convolve(_tmp_ma_ndary, np.ones(_window) / float(_window), 'same')
+                margin = _window//2
+                ave[:margin] = np.nan
+                ave[-1 * margin:] = np.nan
+                ma_series = pd.Series(ave)
+            else:
+                print('[Warn] Window size must be Odd number.')
+                return None
+        else:
+            print('[Warn] _typ is invalid.')
+            return None
+        _df.reset_index(drop=True, inplace=True)
         concat_df = pd.concat([_df, pd.DataFrame(ma_series.T)], axis=1)
         new_col = list(_df.columns)
         new_col.append(_column + '_ma')
