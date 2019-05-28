@@ -28,6 +28,7 @@ class Image_processing:
         if self.c.folder_check(output_fol):
             output_img = ''.join(_path.split('/')[-1].split('.')[0:-1]) + '_smoothed.png'
             cv2.imwrite(os.path.join(output_fol, '/' + output_img), img2)
+        return img2
 
     def gamma_correction(self, _path: str, _gamma: float, _outpath='./'):
         """
