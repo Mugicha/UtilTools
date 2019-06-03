@@ -107,3 +107,45 @@ class Image_processing:
             ext_img = img[height:height + _h, width:width + _w]
             if self.c.folder_check(_outpath):
                 cv2.imwrite(os.path.join(_outpath, str(count) + '.png'), ext_img)
+
+    def erosion(self, _img: np.array, _kernel_size: int):
+        """
+        入力画像を収縮する処理
+        :param _img:収縮させる画像(ndarray)
+        :param _kernel_size:収縮のカーネルサイズ
+        :return:
+        """
+        kernel = np.ones((_kernel_size, _kernel_size), np.uint8)
+        return cv2.erode(_img, kernel, iterations=1)
+
+    def dilation(self, _img: np.ndarray, _kernel_size: int):
+        """
+        入力画像を膨張させる処理
+        :param _img:
+        :param _kernel_size:
+        :return:
+        """
+        kernel = np.ones((_kernel_size, _kernel_size), np.uint8)
+        return cv2.dilate(_img, kernel, iterations=1)
+
+    def opening(self, _img: np.ndarray, _kernel_size: int):
+        """
+        入力画像をオープニング（収縮→膨張）する処理。
+        ホワイトノイズを消すのに強い。
+        :param _img:
+        :param _kernel_size:
+        :return:
+        """
+        kernel = np.ones((_kernel_size, _kernel_size), np.uint8)
+        return cv2.morphologyEx(_img, cv2.MORPH_OPEN, kernel)
+
+    def closing(self, _img: np.ndarray, _kernel_size: int):
+        """
+        入力画像をクロージング（膨張→収縮）する処理。
+        オブジェクト内にあるノイズを消すのに強い。
+        :param _img:
+        :param _kernel_size:
+        :return:
+        """
+        kernel = np.ones((_kernel_size, _kernel_size), np.uint8)
+        return cv2.morphologyEx(_img, cv2.MORPH_CLOSE, kernel)
