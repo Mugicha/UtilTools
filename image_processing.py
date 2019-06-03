@@ -1,7 +1,8 @@
+from tqdm import tqdm
+from skimage import morphology, io
 import cv2
 import os
 import numpy as np
-from tqdm import tqdm
 import UtilTools.common
 
 
@@ -152,3 +153,14 @@ class Image_processing:
 
     def ma_filter(self):
         pass
+
+    def skeltonize(self, _img: np.ndarray):
+        """
+        細線化する処理
+        :param _img: 細線化したい画像ファイル
+        :return:
+        """
+        import matplotlib.pyplot as plt
+        img = morphology.skeletonize(_img)
+        plt.imsave('skel.png', img)
+        return img
