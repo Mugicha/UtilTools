@@ -149,3 +149,6 @@ class Image_processing:
         """
         kernel = np.ones((_kernel_size, _kernel_size), np.uint8)
         return cv2.morphologyEx(_img, cv2.MORPH_CLOSE, kernel)
+
+    def ma_filter(self):
+        pass
