@@ -5,6 +5,7 @@ from sklearn.decomposition import FastICA
 from sklearn.manifold import TSNE
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from scipy import fftpack
+from tqdm import tqdm
 from . import plot
 
 
@@ -162,3 +163,30 @@ class DataManipulation:
         new_col.append(_column + '_ma')
         concat_df.columns = new_col
         return concat_df
+
+
+class FeatureSelection:
+    def __init__(self):
+        pass
+
+    def col_based_feature_selection(self, _df: pd.DataFrame, _cor_threshold: float=0.95, _drop: bool=True):
+        """
+        相関係数の高い変数同士を探して、次元削減を行う処理
+        :param _df:
+        :param _cor_threshold:
+        :param _drop:
+        :return:
+        """
+        bef_var = len(_df.columns)
+        feat_corr = set()
+        corr_matrix = _df.corr()
+        for i in tqdm(range(len(corr_matrix.columns))):
+            for j in range(i):
+                if abs(corr_matrix.iloc[i, j]) > _cor_threshold:
+                    feat_name = corr_matrix.columns[i]
+                    feat_corr.add(feat_name)
+        if _drop:
+            _df.drop(labels=feat_corr, axis='columns', inplace=True)
+
+        print('Feature variables reduced to ' + str(bef_var - len(feat_corr)) + ' from ' + str(bef_var) + '.')
+        return _df
