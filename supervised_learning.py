@@ -1,6 +1,7 @@
 from keras import Sequential
 from keras.optimizers import Adam
 from keras.preprocessing.image import ImageDataGenerator
+from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import os
 
@@ -15,6 +16,9 @@ class SupervisedLearning:
         self.y_valid = None
         self.train_generator = None
         self.validation_generator = None
+
+    def import_data(self, _x, _y):
+        self.x_train, self.x_valid, self.y_train, self.y_valid = train_test_split(_x.values, _y.values, test_size=0.25)
 
     def import_data_from_dir(self, _train_dir: str, _valid_dir: str, _img_size: tuple):
         self.train_generator = ImageDataGenerator().flow_from_directory(
@@ -47,8 +51,8 @@ class SupervisedLearning:
         :return: None as Error. 0 as Success.
         """
         #Train and Valid data check.
-        if (self.x_train is None or self.y_train is None) or self.train_generator is None: return None
-        if (self.x_valid is None or self.y_valid is None) or self.validation_generator is None: return None
+        # if (self.x_train is None or self.y_train is None) or self.train_generator is None: return None
+        # if (self.x_valid is None or self.y_valid is None) or self.validation_generator is None: return None
         train_data_type = None
         if self.x_train is not None:
             train_data_type = 'from_list'
@@ -66,6 +70,8 @@ class SupervisedLearning:
         # Compile model.
         if _type == 'category':
             _model.compile(optimizer=self.optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+        elif _type == 'regression':
+            _model.compile(optimizer=self.optimizer, loss='mean_squared_error', metrics=['accuracy'])
 
         if train_data_type == 'from_list':
             history = _model.fit(self.x_train, self.y_train,

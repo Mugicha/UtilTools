@@ -75,11 +75,7 @@ class FileOperation:
             my_parser = lambda date: pd.datetime.strptime(date, date_format)
             return pd.read_csv(_path, parse_dates=[date_data_loc], sep=sep,
                                date_parser=my_parser, encoding=self.detect_char_code(_path), header=header)
-        try:
-            return pd.read_csv(_path, header=header, sep=sep)
-        except Exception as e:
-            print(e)
-            print('Cannot import csv file. [' + _path + ']')
+        return pd.read_csv(_path, header=header, sep=sep)
 
     @staticmethod
     def df_to_csv(_df: pd.DataFrame, _output_dir: str = './', _output_file: str = 'UtilTool.csv', _encode: str = 'utf8'):
@@ -133,16 +129,12 @@ class FileOperation:
         :param _sheet_name: exportしたexcelのシート名
         :param _encoding: エクスポート時の文字コード（default: utf-8)
         :param _index: excel出力時にインデックスもexportするかどうか。
-        :return: 終了コード（0:正常, 1:異常）
+        :return: always None
         """
         if os.path.splitext(_output_file)[1] != '.xlsx':
             print('[df_to_excel] Extension must be xlsx.')
             return None
-        try:
-            _df.to_excel(os.path.join(_output_dir, _output_file), sheet_name=_sheet_name, index=_index, encoding=_encoding)
-        except:
-            print('[df_to_excel] Cannot export to excel.')
-            exit(0)
+        _df.to_excel(os.path.join(_output_dir, _output_file), sheet_name=_sheet_name, index=_index, encoding=_encoding)
 
     @staticmethod
     def multiple_df_to_excel(_output_dir: str, _output_file: str, _output_df_list: list or dict):
@@ -154,19 +146,16 @@ class FileOperation:
         :return:
         """
         from pandas import ExcelWriter
-        try:
-            with ExcelWriter(os.path.join(_output_dir, _output_file)) as writer:
-                print(type(_output_df_list))
-                if "list" in str(type(_output_df_list)):
-                    for idx, df in enumerate(_output_df_list):
-                        df.to_excel(writer, 'sheets%s' % idx)
-                        writer.save()
-                elif 'dict' in str(type(_output_df_list)):
-                    for key in _output_df_list.keys():
-                        _output_df_list[key].to_excel(writer, str(key))
-                        writer.save()
-        except:
-            print('[multiple_df_to_excel] Cannot export to excel.')
+        with ExcelWriter(os.path.join(_output_dir, _output_file)) as writer:
+            print(type(_output_df_list))
+            if "list" in str(type(_output_df_list)):
+                for idx, df in enumerate(_output_df_list):
+                    df.to_excel(writer, 'sheets%s' % idx)
+                    writer.save()
+            elif 'dict' in str(type(_output_df_list)):
+                for key in _output_df_list.keys():
+                    _output_df_list[key].to_excel(writer, str(key))
+                    writer.save()
 
     @staticmethod
     def txt_to_ary(_path: str):

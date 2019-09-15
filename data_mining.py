@@ -169,12 +169,13 @@ class FeatureSelection:
     def __init__(self):
         pass
 
-    def col_based_feature_selection(self, _df: pd.DataFrame, _cor_threshold: float=0.95, _drop: bool=True):
+    def col_based_feature_selection(self, _df: pd.DataFrame, _cor_threshold: float=0.95, _drop: bool=True, _return_col: bool=False):
         """
         相関係数の高い変数同士を探して、次元削減を行う処理
         :param _df:
         :param _cor_threshold:
         :param _drop:
+        :param _return_col:
         :return:
         """
         bef_var = len(_df.columns)
@@ -189,4 +190,13 @@ class FeatureSelection:
             _df.drop(labels=feat_corr, axis='columns', inplace=True)
 
         print('Feature variables reduced to ' + str(bef_var - len(feat_corr)) + ' from ' + str(bef_var) + '.')
-        return _df
+        if _return_col:
+            return _df, list(feat_corr)
+        else:
+            return _df
+
+    def lasso_based_feature_selection(self, _x, _y, _alpha: float=1.0, _iter: int=10000):
+        from sklearn.linear_model import Lasso
+        lasso = Lasso(alpha=_alpha, normalize=True, max_iter=_iter)
+        lasso.fit(_x, _y)
+        return lasso.coef_
