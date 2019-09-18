@@ -169,7 +169,11 @@ class FeatureSelection:
     def __init__(self):
         pass
 
-    def col_based_feature_selection(self, _df: pd.DataFrame, _cor_threshold: float=0.95, _drop: bool=True, _return_col: bool=False):
+    def col_based_feature_selection(self, _df: pd.DataFrame,
+                                    _cor_threshold: float=0.95,
+                                    _cor_matrix: pd.DataFrame = None,
+                                    _drop: bool=True,
+                                    _return_col: bool=False):
         """
         相関係数の高い変数同士を探して、次元削減を行う処理
         :param _df:
@@ -180,11 +184,12 @@ class FeatureSelection:
         """
         bef_var = len(_df.columns)
         feat_corr = set()
-        corr_matrix = _df.corr()
-        for i in tqdm(range(len(corr_matrix.columns))):
+        if _cor_matrix is None:
+            _cor_matrix = _df.corr()
+        for i in tqdm(range(len(_cor_matrix.columns))):
             for j in range(i):
-                if abs(corr_matrix.iloc[i, j]) > _cor_threshold:
-                    feat_name = corr_matrix.columns[i]
+                if abs(_cor_matrix.iloc[i, j]) > _cor_threshold:
+                    feat_name = _cor_matrix.columns[i]
                     feat_corr.add(feat_name)
         if _drop:
             _df.drop(labels=feat_corr, axis='columns', inplace=True)
