@@ -215,12 +215,12 @@ class NaturalLang:
 
 
 class W2V:
-    def __init__(self, _sentences):
+    def __init__(self, _sentences, _model=None):
         """
         :param _sentences: 学習に使うコーパス [['I', 'like', 'python'], ['You', 'like', 'python']...]
         """
-        self.w2v_model = None
         self.sentences = _sentences
+        self.w2v_model = _model if _model is not None
 
     def create_model(self, _size: int, _min_cnt: int, _window: int):
         """
