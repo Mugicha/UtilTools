@@ -326,7 +326,7 @@ class D2V:
         :return:
         """
         if self.d2v_model is None:
-            print('[D2V] model is empty.')
+            print('[D2V] model is None.')
             return None
         self.d2v_model.save(_save_path)
 
@@ -335,6 +335,6 @@ class D2V:
 
     def search_sim_word(self, word1, word2):
         if self.d2v_model is None:
-            print('[D2V] model is empty.')
+            print('[D2V] model is None.')
             return None
         return self.d2v_model.similarity(word1, word2)
