@@ -219,7 +219,7 @@ class W2V:
         :param _sentences: 学習に使うコーパス [['I', 'like', 'python'], ['You', 'like', 'python']...]
         """
         self.sentences = _sentences
-        self.w2v_model = _model if _model is not None
+        self.w2v_model = _model
 
     def create_model(self, _size: int, _min_cnt: int, _window: int):
         """
@@ -280,7 +280,7 @@ class W2V:
 
 class D2V:
     def __init__(self, _sentences, _model=None):
-        self.d2v_model = _model if _model is not None
+        self.d2v_model = _model
         self.sentences = [TaggedDocument(doc, [i]) for i, doc in enumerate(_sentences)]
 
     def create_model(self, _dm: int=1, _size: int=300, _window: int=8, _min_count: int=10, _workers: int=4):
