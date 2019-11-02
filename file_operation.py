@@ -158,15 +158,16 @@ class FileOperation:
                     writer.save()
 
     @staticmethod
-    def txt_to_ary(_path: str):
+    def txt_to_ary(_path: str, _encoding: str = 'utf8'):
         """
         対象のファイルを1行ごとに配列に格納してreturnする。
         改行は配列に入れる際に削除される。
         :param _path: 配列に格納したファイルのパス
+        :param _encoding: file encoding
         :return: 1行1要素として格納された配列
         """
         _list = []
-        with open(_path) as f:
+        with open(_path, encoding=_encoding) as f:
             for line in f:
                 _list.append(line.replace('\n', ''))
         return _list  # type: list
