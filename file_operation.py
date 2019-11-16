@@ -146,15 +146,14 @@ class FileOperation:
         :return:
         """
         from pandas import ExcelWriter
-        with ExcelWriter(os.path.join(_output_dir, _output_file)) as writer:
-            print(type(_output_df_list))
+        with ExcelWriter(os.path.join(_output_dir, _output_file), engine='openpyxl') as writer:
             if "list" in str(type(_output_df_list)):
                 for idx, df in enumerate(_output_df_list):
                     df.to_excel(writer, 'sheets%s' % idx)
                     writer.save()
             elif 'dict' in str(type(_output_df_list)):
                 for key in _output_df_list.keys():
-                    _output_df_list[key].to_excel(writer, str(key))
+                    _output_df_list[key].to_excel(writer, str(key), index=False)
                     writer.save()
 
     @staticmethod
