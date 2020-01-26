@@ -169,7 +169,8 @@ class FeatureSelection:
     def __init__(self):
         pass
 
-    def col_based_feature_selection(self, _df: pd.DataFrame,
+    @staticmethod
+    def col_based_feature_selection(_df: pd.DataFrame,
                                     _cor_threshold: float=0.95,
                                     _cor_matrix: pd.DataFrame = None,
                                     _drop: bool=True,
@@ -178,6 +179,7 @@ class FeatureSelection:
         相関係数の高い変数同士を探して、次元削減を行う処理
         :param _df:
         :param _cor_threshold:
+        :param _cor_matrix:
         :param _drop:
         :param _return_col:
         :return:
@@ -200,7 +202,16 @@ class FeatureSelection:
         else:
             return _df
 
-    def lasso_based_feature_selection(self, _x, _y, _alpha: float=1.0, _iter: int=10000):
+    @staticmethod
+    def lasso_based_feature_selection(_x, _y, _alpha: float=1.0, _iter: int=10000):
+        """
+        Lasso回帰(L1正則化)による次元削減
+        :param _x:
+        :param _y:
+        :param _alpha:
+        :param _iter:
+        :return:
+        """
         from sklearn.linear_model import Lasso
         lasso = Lasso(alpha=_alpha, normalize=True, max_iter=_iter)
         lasso.fit(_x, _y)
