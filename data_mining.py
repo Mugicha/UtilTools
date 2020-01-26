@@ -176,7 +176,11 @@ class FeatureSelection:
                                     _drop: bool=True,
                                     _return_col: bool=False):
         """
-        相関係数の高い変数同士を探して、次元削減を行う処理
+        フィルターメソッドを使った次元削減方法.
+        (相関係数の高い変数同士を探して、次元削減を行う処理)
+        ※　注意点として、複数変数同士が合わさって初めて相関が出るようなケースには使えない
+        参考：https://ocw.tsukuba.ac.jp/wp/wp-content/uploads/2019/10/fa67c4f9c50e67abbe3c9a684bea594c.pdf
+
         :param _df:
         :param _cor_threshold:
         :param _cor_matrix:
@@ -203,16 +207,17 @@ class FeatureSelection:
             return _df
 
     @staticmethod
-    def lasso_based_feature_selection(_x, _y, _alpha: float=1.0, _iter: int=10000):
+    def lasso_based_feature_selection(_x, _t, _alpha: float=1.0, _iter: int=10000):
         """
-        Lasso回帰(L1正則化)による次元削減
-        :param _x:
-        :param _y:
-        :param _alpha:
+        Lasso回帰(L1正則化)による次元削減.
+        Σ(t_i - w^T * x_i)^2 + alpla * ||w||_1
+        :param _x: 学習変数
+        :param _t: 目的変数
+        :param _alpha: 正則化パラメーター(λのこと). 0:正則化無し
         :param _iter:
         :return:
         """
         from sklearn.linear_model import Lasso
         lasso = Lasso(alpha=_alpha, normalize=True, max_iter=_iter)
-        lasso.fit(_x, _y)
-        return lasso.coef_
+        lasso.fit(_x, _t)
+        return lasso
