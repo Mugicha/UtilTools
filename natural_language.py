@@ -29,7 +29,8 @@ class UtilTokenizer:
         :return:
         """
         from gensim.models import Word2Vec
-        model = Word2Vec.load('models/pretrained/word2vec/ja/ja.bin')
+        model_path = 'models/pretrained/word2vec/ja/ja.bin'
+        model = Word2Vec.load(model_path)
 
         # 文章を単語に分割する.
         wakachied_sentences = []
