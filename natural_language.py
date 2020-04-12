@@ -3,12 +3,78 @@ import pandas as pd
 import numpy as np
 import MeCab
 import os
-import mojimoji
+import jaconv
 from gensim.models import word2vec
 from tqdm import tqdm
 from multiprocessing import Pool
 from gensim.models.doc2vec import Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
+
+
+class UtilTokenizer:
+    def __init__(self):
+        self.mecab = MeCab.Tagger('-Ochasen')
+
+    def tfidf_tokenize(self):
+        pass
+
+    def setntencepiece_w2v_tokenize(self):
+        pass
+
+    def w2v_tokenize(self, sentences: list, hinshi_filter: list=[]):
+        """
+        入力された文章を、wikipedia学習済みのWord2Vecでベクトル化する処理.
+        :param sentences:       ベクトル化したい文章の配列. [setnence1, sentence2, ...]
+        :param hinshi_filter:   分かち書きした際に特定の品詞だけを使いたい場合、この配列に指定する. ['名詞', '動詞']
+        :return:
+        """
+        from gensim.models import Word2Vec
+        model = Word2Vec.load('models/pretrained/word2vec/ja/ja.bin')
+
+        # 文章を単語に分割する.
+        wakachied_sentences = []
+        for _sentence in sentences:
+            wakachied_sentence = self.mecab.parse(_sentence).split('\n')[:-2]  # 分かち
+
+            # 分かち書きした単語ごとの処理.
+            word_in_a_sentence = []
+            for each_word in wakachied_sentence:
+                _hinshi = each_word.split('\t')[3].split('-')[0]  # 品詞: 名詞-一般名詞
+                _genkei = each_word.split('\t')[2]  # 原型
+
+                # 品詞の指定がある場合.
+                if len(hinshi_filter) != 0:
+                    if _hinshi in hinshi_filter:
+                        word_in_a_sentence.append(_genkei)
+
+                # 品詞の指定が無い場合.
+                else:
+                    word_in_a_sentence.append(_genkei)
+
+            # 1文を分かち書きした結果を追加.
+            wakachied_sentences.append(word_in_a_sentence)
+
+        # Word2Vecを使って単語の足し上げ.
+        sentence_vectors = []
+        for each_sentence in wakachied_sentences:
+            one_sentence_vec = np.zeros(shape=(model.wv.vector_size,))
+            for each_word in each_sentence:
+                try:
+                    one_sentence_vec += model.wv[each_word]
+                except:
+                    print('[natural_language][w2v_tokenize] Does not exist word: {}'.format(each_word))
+                    continue
+            sentence_vectors.append(one_sentence_vec)
+        return sentence_vectors
+
+    def fasttext_tokenize(self):
+        pass
+
+    def glove_tokenize(self):
+        pass
+
+    def elmo_tokenize(self):
+        pass
 
 
 class NaturalLang:
@@ -36,7 +102,7 @@ class NaturalLang:
             return None
         # 文字列の統一
         for g in range(len(each_item)):
-            each_item[g] = mojimoji.han_to_zen(str(each_item[g]), kana=False, ascii=False)
+            each_item[g] = jaconv.h2z(str(each_item[g]), kana=False, ascii=False)
             each_item[g] = each_item[g].replace('(', '（').replace(')', '）')
         # MeCabで分かち書き
         # In Ochasen
@@ -152,8 +218,7 @@ class NaturalLang:
             gaiyo = _df[_column].values  # type: np.ndarray
             # 文字列の統一
             for g in range(len(gaiyo)):
-                import mojimoji
-                gaiyo[g] = mojimoji.han_to_zen(str(gaiyo[g]), kana=False, ascii=False)  # 半角→全角
+                gaiyo[g] = jaconv.h2z(str(gaiyo[g]), kana=False, ascii=False)  # 半角→全角
                 gaiyo[g] = gaiyo[g].replace('(', '（').replace(')', '）')  # 半角カッコを全角に統一する
             print('[Info] Start to create histogram.')
             if _op is not None:
@@ -187,11 +252,6 @@ class NaturalLang:
             cnt_df_2 = cnt_df.iloc[:, 0].map(f_brackets)
             output_df = pd.concat([cnt_df, cnt_df_2], axis=1)
             return output_df
-
-    def knp_parsing(self, _sentences: str):
-        from pyknp import KNP
-        k = KNP(option='-tab', jumanpp=False)
-        k.parse(_sentences)
 
     def tfidf(self, _corpus: list, _min_df: float = 0.03):
         """
