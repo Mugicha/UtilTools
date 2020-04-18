@@ -12,7 +12,7 @@ from gensim.models.doc2vec import TaggedDocument
 
 
 class UtilTokenizer:
-    def __init__(self, mecab_option: str=''):
+    def __init__(self, mecab_option: str = ''):
         if mecab_option == '':
             self.mecab = MeCab.Tagger('-Ochasen')
         else:
@@ -21,18 +21,114 @@ class UtilTokenizer:
     def tfidf_tokenize(self):
         pass
 
-    def setntencepiece_w2v_tokenize(self):
-        pass
+    def setntencepiece_w2v_tokenize(self,
+                                    sentences: list,
+                                    model_path: str = 'models/pretrained/sentencepiece',
+                                    typ: str = 'sum',
+                                    seq_padding_typ: int = 0,
+                                    seq_len: int = 512):
+        """
+        入力された文章を、wikipedia学習済みのsentencepiece(300次元)でベクトル化する処理.
+        学習済みモデルはここから貰った.
+        https://github.com/lhideki/text-vectorian/blob/master/text_vectorian/config.yml
+
+        :param sentences: ベクトル化したい文章の配列. [setnence1, sentence2, ...]
+        :param model_path: sentencepieceの学習済みモデルのPath.
+        :param typ: ベクトル化の種類を指定する. sum: 単語毎のベクトルを足し上げる. seq: 時系列のベクトルにする.
+        :param seq_padding_typ: typ=seqの場合の、padding方法. 0: 先頭から埋めて余ったらゼロ埋め. 1: normalを逆順にする. 2: 後ろから埋めて余ったらゼロ埋め.
+        :param seq_len: typ=seqの場合の、シーケンス長.
+        :return:
+        """
+        import sentencepiece as spm
+        from gensim.models import Word2Vec
+
+        # Load sentencepiece model
+        sp = spm.SentencePieceProcessor()
+        sp_model = sp.load(os.path.join(model_path, 'wikija-sentencepiece_300.model'))
+
+        # Load word2vec model
+        model = Word2Vec.load(os.path.join(model_path, 'wikija-sentencepieced_word2vec_300.model'))
+
+        # 文章をsub-wordに分割する.
+        split_sentences = []
+        for _sentence in sentences:
+            split_sentence = sp.encode_as_pieces(_sentence)  # 分割
+
+            # 分割したsub-wordごとの処理.
+            word_in_a_sentence = []
+            for each_word in split_sentence:
+                word_in_a_sentence.append(each_word)
+
+            # 1文をsub-wordに分割した結果を追加.
+            split_sentences.append(word_in_a_sentence)
+
+        sentence_vectors = []
+
+        # Vector足上げ.
+        if typ == 'sum':
+            for each_sentence in split_sentences:
+                one_sentence_vec = np.zeros(shape=(model.wv.vector_size,))
+                for each_word in each_sentence:
+                    try:
+                        one_sentence_vec += model.wv[each_word]
+                    except:
+                        print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
+                        continue
+                sentence_vectors.append(one_sentence_vec)
+
+        # 時系列順.
+        elif typ == 'seq':
+
+            # 後方から埋める
+            if seq_padding_typ == 2:
+                for each_sentence in split_sentences:
+                    one_sentence_seq_vec = np.zeros(shape=(seq_len, model.wv.vector_size))
+                    for i, each_word in enumerate(each_sentence[::-1]):
+                        try:
+                            if i < seq_len:
+                                print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
+                                one_sentence_seq_vec[-i-1, :] = model.wv[each_word]
+                        except:
+                            print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
+                            continue
+                    sentence_vectors.append(one_sentence_seq_vec)
+
+            # 先頭から埋める
+            else:
+                for each_sentence in split_sentences:
+                    one_sentence_seq_vec = np.zeros(shape=(seq_len, model.wv.vector_size))
+                    for i, each_word in enumerate(each_sentence):
+                        try:
+                            if i < seq_len:
+                                print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
+                                one_sentence_seq_vec[i, :] = model.wv[each_word]
+                        except:
+                            print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
+                            continue
+                    sentence_vectors.append(one_sentence_seq_vec)
+
+        # エラー
+        else:
+            print('[natural_language][w2v_tokenize] Unknown return type: {}'.format(typ))
+
+        # Return
+        sentence_vectors = np.stack(sentence_vectors)
+        if seq_padding_typ == 1:
+            return np.flip(sentence_vectors, axis=1)  # seqの順番を反転させる. [2, 3, 4, 0, 0, 0] -> [0, 0, 0, 4, 3, 2]
+        else:
+            return sentence_vectors
 
     def w2v_tokenize(self,
                      sentences: list,
-                     model_path: str='models/pretrained/word2vec/jawiki.all_vectors.100d.txt',
-                     hinshi_filter: list=[],
-                     typ: str='sum',
-                     seq_padding_typ: int=0,
-                     seq_len: int=256):
+                     model_path: str = 'models/pretrained/word2vec/jawiki.all_vectors.100d.txt',
+                     hinshi_filter: list = [],
+                     typ: str = 'sum',
+                     seq_padding_typ: int = 0,
+                     seq_len: int = 256):
         """
         入力された文章を、wikipedia学習済みのWord2Vecでベクトル化する処理.
+        学習済みモデルはここから貰った.
+        http://www.cl.ecei.tohoku.ac.jp/~m-suzuki/jawiki_vector/
 
         :param sentences: ベクトル化したい文章の配列. [setnence1, sentence2, ...]
         :param model_path: word2vecの学習済みモデルのPath. KeyedVectorsでload可能な形式.
@@ -92,7 +188,7 @@ class UtilTokenizer:
                     for i, each_word in enumerate(each_sentence[::-1]):
                         try:
                             if i < seq_len:
-                                # print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
+                                print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
                                 one_sentence_seq_vec[-i-1, :] = model.wv[each_word]
                         except:
                             print('[natural_language][w2v_tokenize] Does not exist word: {}'.format(each_word))
@@ -458,5 +554,7 @@ class D2V:
 
 if __name__ == '__main__':
     tokenizer = UtilTokenizer()
-    ret = tokenizer.w2v_tokenize(['今日は寝過ごした。', '昼寝は無いだろう。'], typ='seq', seq_padding_typ=2, seq_len=5)
-    print('kita')
+    ret = tokenizer.setntencepiece_w2v_tokenize(sentences=['今日は寝過ごした。', '昼寝は無いだろう。'],
+                                                typ='seq',
+                                                seq_padding_typ=2,
+                                                seq_len=5)
