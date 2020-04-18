@@ -120,14 +120,14 @@ class UtilTokenizer:
 
     def w2v_tokenize(self,
                      sentences: list,
-                     model_path: str = 'models/pretrained/word2vec/jawiki.all_vectors.100d.txt',
+                     model_path: str = 'models/pretrained/word2vec/jawiki.all_vectors.100d.bin',
                      hinshi_filter: list = [],
                      typ: str = 'sum',
                      seq_padding_typ: int = 0,
                      seq_len: int = 256):
         """
         入力された文章を、wikipedia学習済みのWord2Vecでベクトル化する処理.
-        学習済みモデルはここから貰った.
+        学習済みモデルはここから貰った. txtだったので、save_word2vec_format('jawiki.all_vectors.100d.bin', binary=True).
         http://www.cl.ecei.tohoku.ac.jp/~m-suzuki/jawiki_vector/
 
         :param sentences: ベクトル化したい文章の配列. [setnence1, sentence2, ...]
@@ -139,7 +139,7 @@ class UtilTokenizer:
         :return:
         """
         from gensim.models import KeyedVectors
-        model = KeyedVectors.load_word2vec_format(model_path)
+        model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
         # 文章を単語に分割する.
         wakachied_sentences = []
@@ -554,7 +554,7 @@ class D2V:
 
 if __name__ == '__main__':
     tokenizer = UtilTokenizer()
-    ret = tokenizer.setntencepiece_w2v_tokenize(sentences=['今日は寝過ごした。', '昼寝は無いだろう。'],
-                                                typ='seq',
-                                                seq_padding_typ=2,
-                                                seq_len=5)
+    ret = tokenizer.w2v_tokenize(sentences=['今日は寝過ごした。', '昼寝は無いだろう。'],
+                                 typ='seq',
+                                 seq_padding_typ=2,
+                                 seq_len=5)
