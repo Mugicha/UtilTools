@@ -143,7 +143,7 @@ class ImageRecognition:
 class TextClassification:
     def __init__(self,
                  x: np.ndarray,
-                 y: np.ndarray,
+                 y: list,
                  seq_len: int = 512,
                  seq_dim: int = 100,
                  h_dim: int = 300,
