@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-import pandas as pd
-import numpy as np
+import jaconv
 import MeCab
 import os
-import jaconv
+import random
+import sqlite3
+import numpy as np
+import pandas as pd
 from gensim.models import word2vec
-from tqdm import tqdm
-from multiprocessing import Pool
 from gensim.models.doc2vec import Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
+from multiprocessing import Pool
+from tqdm import tqdm
 
 
 class UtilTokenizer:
@@ -124,7 +126,8 @@ class UtilTokenizer:
                      hinshi_filter: list = [],
                      typ: str = 'sum',
                      seq_padding_typ: int = 0,
-                     seq_len: int = 256):
+                     seq_len: int = 256,
+                     ):
         """
         入力された文章を、wikipedia学習済みのWord2Vecでベクトル化する処理.
         学習済みモデルはここから貰った. txtだったので、save_word2vec_format('jawiki.all_vectors.100d.bin', binary=True).
@@ -229,6 +232,134 @@ class UtilTokenizer:
         pass
 
 
+class UtilAugmentation:
+    """
+    テキストデータのデータ拡張を行う機能.
+    以下の論文を参考に実装.
+
+    EDA: Easy Data Augmentation Techniques for
+    Boosting Performance on Text Classification Tasks
+    https://arxiv.org/abs/1901.11196
+
+    CutMix: Regularization Strategy to Train
+    Strong Classifiers with Localizable Features
+    https://arxiv.org/abs/1905.04899
+    """
+    def __init__(self,
+                 model_path: str = 'models/pretrained/word2vec/jawiki.all_vectors.100d.bin',
+                 wordnet_path: str = 'models/nlp/wordnet/wnjpn.db'
+                 ):
+        from gensim.models import KeyedVectors
+        self.w2v_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
+        self.mecab = MeCab.Tagger('-Ochasen')
+        self.conn = sqlite3.connect(wordnet_path)
+
+    def get_synonym_word_w2v(self, _word):
+        try:
+            candidate_words = self.w2v_model.most_similar(_word, topn=5)
+            pickup_idx = int(random.uniform(0, 4))
+        except:
+            return _word
+        return candidate_words[pickup_idx][0]
+
+    def get_synonym_word_wordnet(self, _word):
+        # WordNetに存在する単語か検索
+        cur = self.conn.execute("select * from word where lemma=?", (_word,))
+        word_list = [row for row in cur]
+        if len(word_list) == 0:
+            return _word
+
+        # 類義語を検索
+        synonym_list = []
+        for word in word_list:
+            cur = self.conn.execute("select * from sense where wordid=?", (word[0],))
+            synnet_list = [row for row in cur]
+            for synnet in synnet_list:
+                cur = self.conn.execute(
+                    "select * from sense, word where synset = ? and "
+                    "word.lang = 'jpn' and "
+                    "sense.wordid = word.wordid;",
+                    (synnet[0],)
+                )
+            synonym_list += [row[9] for row in cur]
+
+        # 候補からランダムに選択
+        return synonym_list[int(random.uniform(0, len(synonym_list)))]
+
+    def wakachi(self, _sentence):
+        return self.mecab.parse(_sentence).split('\n')[:-2]
+
+    def synonym_replacement(self,
+                            _sentences: list,
+                            _replacement_type: str = 'wordnet',
+                            _replacement_prob: float = 0.5,
+                            _replacement_hinshi=None,
+                            _return_with_wakachi: bool = True,
+                            ):
+        """
+        word2vecやwordnetを活用し、文書の単語を類義語へ置換し、Data Augmentationする機能.
+
+        :param _sentences: 水増ししたい文章のリスト. e.g. [sentence1, sentence2, ...]
+        :param _replacement_type: 類義語の検索方法. wordnet or w2v
+        :param _replacement_prob: 置換対象の単語を置換する確率.
+        :param _replacement_hinshi: 置換対象の単語の品詞.
+        :param _return_with_wakachi: 分かち書きされた形式で返すかどうか.
+        :return:
+        """
+        # Default list の値設定.
+        # PyCharm先生にこうしろと言われた.
+        if _replacement_hinshi is None:
+            _replacement_hinshi = ['形容詞']
+
+        replaced_sentences = []
+
+        # 文章ごとに類似語に置換.
+        for each_sentence in _sentences:
+            replaced_obj = []
+            words = self.wakachi(each_sentence)
+
+            # 文章内の単語毎に類義語を検索.
+            for idx, each_word in enumerate(words):
+
+                # 置換対象の単語
+                if each_word.split('\t')[3].split('-')[0] in _replacement_hinshi and random.random() <= _replacement_prob:  # 置換の判定
+
+                    # WordNet
+                    if _replacement_type == 'wordnet':
+                        synonym_words = self.get_synonym_word_wordnet(_word=each_word.split('\t')[2])
+                        if synonym_words == each_word.split('\t')[2]:  # wordnetで見つからない単語は、
+                            synonym_words = each_word.split('\t')[0]
+
+                    # Word2Vec
+                    else:
+                        synonym_words = self.get_synonym_word_w2v(_word=each_word.split('\t')[0])
+                    replaced_obj.append(synonym_words)
+
+                # 置換対象外の単語
+                else:
+                    replaced_obj.append(each_word.split('\t')[0])
+
+            # 置換した文書をlistへ追加.
+            if _return_with_wakachi:
+                replaced_sentences.append(replaced_obj)  # 分かち書きで返す
+            else:
+                replaced_sentences.append(''.join(replaced_obj))  # 文章で返す
+
+        return replaced_sentences
+
+    def random_insertion(self):
+        pass
+
+    def random_swap(self):
+        pass
+
+    def random_deletion(self):
+        pass
+
+    def cut_mix(self):
+        pass
+
+
 class NaturalLang:
     def __init__(self, num_to_exec_multithread: int = 3):
         self.num_to_exec_multithread = num_to_exec_multithread
@@ -238,6 +369,7 @@ class NaturalLang:
     def do_wakachi(self, args: list):
         """
         分かち書きの処理を行う機能(multi_threadとして呼び出される側の関数)
+
         :param args: 引数を纏めたリスト[0]: MeCabのオプション、[1]: 分かち書き結果のdict変数の開始キー、[2]: 分かち書き対象のSeries.
         :return:
         """
@@ -553,8 +685,15 @@ class D2V:
 
 
 if __name__ == '__main__':
-    tokenizer = UtilTokenizer()
-    ret = tokenizer.w2v_tokenize(sentences=['今日は寝過ごした。', '昼寝は無いだろう。'],
-                                 typ='seq',
-                                 seq_padding_typ=2,
-                                 seq_len=5)
+    # tokenizer = UtilTokenizer()
+    # ret = tokenizer.w2v_tokenize(sentences=['今日は寝過ごした。', '昼寝は無いだろう。'],
+    #                              typ='seq',
+    #                              seq_padding_typ=2,
+    #                              seq_len=5)
+    aug = UtilAugmentation()
+    ret = aug.synonym_replacement(['今日は面白いくらいに寝過ごした。', '昼寝は決して行わないだろう。'],
+                                  _replacement_prob=1,
+                                  _replacement_hinshi=['動詞', '名詞', '形容詞'],
+                                  _return_with_wakachi=False,
+                                  )
+    print(ret)
