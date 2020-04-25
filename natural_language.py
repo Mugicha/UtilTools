@@ -54,7 +54,7 @@ class UtilTokenizer:
         # 文章をsub-wordに分割する.
         split_sentences = []
         for _sentence in sentences:
-            split_sentence = sp.encode_as_pieces(_sentence)  # 分割
+            split_sentence = sp_model.encode_as_pieces(_sentence)  # 分割
 
             # 分割したsub-wordごとの処理.
             word_in_a_sentence = []
@@ -295,6 +295,7 @@ class UtilAugmentation:
                             _replacement_prob: float = 0.5,
                             _replacement_hinshi=None,
                             _return_with_wakachi: bool = True,
+                            _num_of_argment: int = 10,
                             ):
         """
         word2vecやwordnetを活用し、文書の単語を類義語へ置換し、Data Augmentationする機能.
@@ -304,6 +305,7 @@ class UtilAugmentation:
         :param _replacement_prob: 置換対象の単語を置換する確率.
         :param _replacement_hinshi: 置換対象の単語の品詞.
         :param _return_with_wakachi: 分かち書きされた形式で返すかどうか.
+        :param _num_of_augment: 　1文書を水増しする試行数.
         :return:
         """
         # Default list の値設定.
@@ -315,35 +317,38 @@ class UtilAugmentation:
 
         # 文章ごとに類似語に置換.
         for each_sentence in _sentences:
-            replaced_obj = []
             words = self.wakachi(each_sentence)
 
-            # 文章内の単語毎に類義語を検索.
-            for idx, each_word in enumerate(words):
+            # 水増ししたい回数だけ実施.
+            for _ in range(_num_of_argment):
+                replaced_obj = []
 
-                # 置換対象の単語
-                if each_word.split('\t')[3].split('-')[0] in _replacement_hinshi and random.random() <= _replacement_prob:  # 置換の判定
+                # 文章内の単語毎に類義語を検索.
+                for idx, each_word in enumerate(words):
 
-                    # WordNet
-                    if _replacement_type == 'wordnet':
-                        synonym_words = self.get_synonym_word_wordnet(_word=each_word.split('\t')[2])
-                        if synonym_words == each_word.split('\t')[2]:  # wordnetで見つからない単語は、
-                            synonym_words = each_word.split('\t')[0]
+                    # 置換対象の単語
+                    if each_word.split('\t')[3].split('-')[0] in _replacement_hinshi and random.random() <= _replacement_prob:  # 置換の判定
 
-                    # Word2Vec
+                        # WordNet
+                        if _replacement_type == 'wordnet':
+                            synonym_words = self.get_synonym_word_wordnet(_word=each_word.split('\t')[2])
+                            if synonym_words == each_word.split('\t')[2]:  # wordnetで見つからない単語は、
+                                synonym_words = each_word.split('\t')[0]
+
+                        # Word2Vec
+                        else:
+                            synonym_words = self.get_synonym_word_w2v(_word=each_word.split('\t')[0])
+                        replaced_obj.append(synonym_words)
+
+                    # 置換対象外の単語
                     else:
-                        synonym_words = self.get_synonym_word_w2v(_word=each_word.split('\t')[0])
-                    replaced_obj.append(synonym_words)
+                        replaced_obj.append(each_word.split('\t')[0])
 
-                # 置換対象外の単語
+                # 置換した文書をlistへ追加.
+                if _return_with_wakachi:
+                    replaced_sentences.append(replaced_obj)  # 分かち書きで返す
                 else:
-                    replaced_obj.append(each_word.split('\t')[0])
-
-            # 置換した文書をlistへ追加.
-            if _return_with_wakachi:
-                replaced_sentences.append(replaced_obj)  # 分かち書きで返す
-            else:
-                replaced_sentences.append(''.join(replaced_obj))  # 文章で返す
+                    replaced_sentences.append(''.join(replaced_obj))  # 文章で返す
 
         return replaced_sentences
 
