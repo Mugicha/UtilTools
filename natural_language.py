@@ -20,6 +20,8 @@ class UtilTokenizer:
         else:
             self.mecab = MeCab.Tagger('-Ochasen ' + mecab_option)
 
+        self.w2v_model = None
+
     def tfidf_tokenize(self):
         pass
 
@@ -142,7 +144,8 @@ class UtilTokenizer:
         :return:
         """
         from gensim.models import KeyedVectors
-        model = KeyedVectors.load_word2vec_format(model_path, binary=True)
+        if self.w2v_model is None:
+            self.w2v_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
         # 文章を単語に分割する.
         wakachied_sentences = []
@@ -172,10 +175,10 @@ class UtilTokenizer:
         # Vector足上げ.
         if typ == 'sum':
             for each_sentence in wakachied_sentences:
-                one_sentence_vec = np.zeros(shape=(model.wv.vector_size,))
+                one_sentence_vec = np.zeros(shape=(self.w2v_model.wv.vector_size,))
                 for each_word in each_sentence:
                     try:
-                        one_sentence_vec += model.wv[each_word]
+                        one_sentence_vec += self.w2v_model.wv[each_word]
                     except:
                         print('[natural_language][w2v_tokenize] Does not exist word: {}'.format(each_word))
                         continue
@@ -187,12 +190,12 @@ class UtilTokenizer:
             # 後方から埋める
             if seq_padding_typ == 2:
                 for each_sentence in wakachied_sentences:
-                    one_sentence_seq_vec = np.zeros(shape=(seq_len, model.wv.vector_size))
+                    one_sentence_seq_vec = np.zeros(shape=(seq_len, self.w2v_model.wv.vector_size))
                     for i, each_word in enumerate(each_sentence[::-1]):
                         try:
                             if i < seq_len:
-                                print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
-                                one_sentence_seq_vec[-i-1, :] = model.wv[each_word]
+                                print('word: {}\tvec: {}'.format(each_word, self.w2v_model.wv[each_word][0]))  # for debug.
+                                one_sentence_seq_vec[-i-1, :] = self.w2v_model.wv[each_word]
                         except:
                             print('[natural_language][w2v_tokenize] Does not exist word: {}'.format(each_word))
                             continue
@@ -201,11 +204,11 @@ class UtilTokenizer:
             # 先頭から埋める
             else:
                 for each_sentence in wakachied_sentences:
-                    one_sentence_seq_vec = np.zeros(shape=(seq_len, model.wv.vector_size))
+                    one_sentence_seq_vec = np.zeros(shape=(seq_len, self.w2v_model.wv.vector_size))
                     for i, each_word in enumerate(each_sentence):
                         try:
                             if i < seq_len:
-                                one_sentence_seq_vec[i, :] = model.wv[each_word]
+                                one_sentence_seq_vec[i, :] = self.w2v_model.wv[each_word]
                         except:
                             print('[natural_language][w2v_tokenize] Does not exist word: {}'.format(each_word))
                             continue
