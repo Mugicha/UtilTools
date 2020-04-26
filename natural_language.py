@@ -284,7 +284,7 @@ class UtilAugmentation:
             synonym_list += [row[9] for row in cur]
 
         # 候補からランダムに選択
-        return synonym_list[int(random.uniform(0, len(synonym_list)))]
+        return synonym_list[int(random.uniform(0, len(synonym_list)-1))]
 
     def wakachi(self, _sentence):
         return self.mecab.parse(_sentence).split('\n')[:-2]
