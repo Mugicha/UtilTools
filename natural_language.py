@@ -299,6 +299,7 @@ class UtilAugmentation:
                             _replacement_hinshi=None,
                             _return_with_wakachi: bool = True,
                             _num_of_argment: int = 10,
+                            _label=None,
                             ):
         """
         word2vecやwordnetを活用し、文書の単語を類義語へ置換し、Data Augmentationする機能.
@@ -308,7 +309,8 @@ class UtilAugmentation:
         :param _replacement_prob: 置換対象の単語を置換する確率.
         :param _replacement_hinshi: 置換対象の単語の品詞.
         :param _return_with_wakachi: 分かち書きされた形式で返すかどうか.
-        :param _num_of_augment: 　1文書を水増しする試行数.
+        :param _num_of_augment: 1文書を水増しする試行数.
+        :param _label: 水増しするデータの正解ラベルがあるならここで指定すれば、一緒に水増しする.
         :return:
         """
         # Default list の値設定.
@@ -317,9 +319,10 @@ class UtilAugmentation:
             _replacement_hinshi = ['形容詞']
 
         replaced_sentences = []
+        replaced_label = []
 
         # 文章ごとに類似語に置換.
-        for each_sentence in _sentences:
+        for each_sentence, each_label in zip(_sentences, _label):
             words = self.wakachi(each_sentence)
 
             # 水増ししたい回数だけ実施.
@@ -350,10 +353,15 @@ class UtilAugmentation:
                 # 置換した文書をlistへ追加.
                 if _return_with_wakachi:
                     replaced_sentences.append(replaced_obj)  # 分かち書きで返す
+                    replaced_label.append(each_label)
                 else:
                     replaced_sentences.append(''.join(replaced_obj))  # 文章で返す
+                    replaced_label.append(each_label)
 
-        return replaced_sentences
+        if _label is None:
+            return replaced_sentences
+        else:
+            return replaced_sentences, replaced_label
 
     def random_insertion(self):
         pass
