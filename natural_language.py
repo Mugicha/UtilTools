@@ -284,7 +284,10 @@ class UtilAugmentation:
             synonym_list += [row[9] for row in cur]
 
         # 候補からランダムに選択
-        return synonym_list[int(random.uniform(0, len(synonym_list)-1))]
+        if len(synonym_list) == 0:
+            return _word
+        else:
+            return synonym_list[int(random.uniform(0, len(synonym_list)-1))]
 
     def wakachi(self, _sentence):
         return self.mecab.parse(_sentence).split('\n')[:-2]
@@ -696,7 +699,7 @@ if __name__ == '__main__':
     #                              seq_padding_typ=2,
     #                              seq_len=5)
     aug = UtilAugmentation()
-    ret = aug.synonym_replacement(['今日は面白いくらいに寝過ごした。', '昼寝は決して行わないだろう。'],
+    ret = aug.synonym_replacement(['カスタムカー＆キャンギャルの祭典が開催！【東京オートサロン 2011】'],
                                   _replacement_prob=1,
                                   _replacement_hinshi=['動詞', '名詞', '形容詞'],
                                   _return_with_wakachi=False,
