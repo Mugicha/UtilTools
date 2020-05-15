@@ -90,7 +90,7 @@ class UtilTokenizer:
                     for i, each_word in enumerate(each_sentence[::-1]):
                         try:
                             if i < seq_len:
-                                print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
+                                # print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
                                 one_sentence_seq_vec[-i-1, :] = model.wv[each_word]
                         except:
                             print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
