@@ -104,7 +104,7 @@ class UtilTokenizer:
                     for i, each_word in enumerate(each_sentence):
                         try:
                             if i < seq_len:
-                                print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
+                                # print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
                                 one_sentence_seq_vec[i, :] = model.wv[each_word]
                         except:
                             print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
@@ -194,7 +194,7 @@ class UtilTokenizer:
                     for i, each_word in enumerate(each_sentence[::-1]):
                         try:
                             if i < seq_len:
-                                print('word: {}\tvec: {}'.format(each_word, self.w2v_model.wv[each_word][0]))  # for debug.
+                                # print('word: {}\tvec: {}'.format(each_word, self.w2v_model.wv[each_word][0]))  # for debug.
                                 one_sentence_seq_vec[-i-1, :] = self.w2v_model.wv[each_word]
                         except:
                             print('[natural_language][w2v_tokenize] Does not exist word: {}'.format(each_word))
@@ -440,7 +440,7 @@ class NaturalLang:
                         except IndexError:
                             word_dict[gc][wc]['hinshi'].append('')
                     # 単語の登録 for Ochasen
-                    word_dict[gc][wc]['word'] = w.split('\t')[0]
+                    word_dict[gc][wc]['word'] = w.split('\t')[2]  # 原型で登録
                     word_cnt += 1
                 # 'EOS'対策
                 except:
