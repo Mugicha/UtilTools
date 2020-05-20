@@ -48,7 +48,7 @@ class UtilTokenizer:
 
         # Load sentencepiece model
         sp = spm.SentencePieceProcessor()
-        sp_model = sp.load(os.path.join(model_path, 'wikija-sentencepiece_300.model'))
+        sp.load(os.path.join(model_path, 'wikija-sentencepiece_300.model'))
 
         # Load word2vec model
         model = Word2Vec.load(os.path.join(model_path, 'wikija-sentencepieced_word2vec_300.model'))
@@ -56,7 +56,7 @@ class UtilTokenizer:
         # 文章をsub-wordに分割する.
         split_sentences = []
         for _sentence in sentences:
-            split_sentence = sp_model.encode_as_pieces(_sentence)  # 分割
+            split_sentence = sp.encode_as_pieces(_sentence)  # 分割
 
             # 分割したsub-wordごとの処理.
             word_in_a_sentence = []
