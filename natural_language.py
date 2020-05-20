@@ -13,6 +13,15 @@ from multiprocessing import Pool
 from tqdm import tqdm
 
 
+class UtilNAL:
+    def __init__(self):
+        pass
+
+    def clean(self, sentence):
+        sentence = jaconv.h2z(str(sentence), kana=True, ascii=True)
+        return sentence
+
+
 class UtilTokenizer:
     def __init__(self, mecab_option: str = ''):
         if mecab_option == '':
@@ -21,6 +30,7 @@ class UtilTokenizer:
             self.mecab = MeCab.Tagger('-Ochasen ' + mecab_option)
 
         self.w2v_model = None
+        self.u = UtilNAL()
 
     def tfidf_tokenize(self):
         pass
@@ -30,7 +40,8 @@ class UtilTokenizer:
                                     model_path: str = 'models/pretrained/sentencepiece',
                                     typ: str = 'sum',
                                     seq_padding_typ: int = 0,
-                                    seq_len: int = 512):
+                                    seq_len: int = 512,
+                                    ):
         """
         入力された文章を、wikipedia学習済みのsentencepiece(300次元)でベクトル化する処理.
         学習済みモデルはここから貰った.
@@ -76,7 +87,8 @@ class UtilTokenizer:
                     try:
                         one_sentence_vec += model.wv[each_word]
                     except:
-                        print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
+                        print(
+                            '[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
                         continue
                 sentence_vectors.append(one_sentence_vec)
 
@@ -91,9 +103,10 @@ class UtilTokenizer:
                         try:
                             if i < seq_len:
                                 # print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
-                                one_sentence_seq_vec[-i-1, :] = model.wv[each_word]
+                                one_sentence_seq_vec[-i - 1, :] = model.wv[each_word]
                         except:
-                            print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
+                            print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(
+                                each_word))
                             continue
                     sentence_vectors.append(one_sentence_seq_vec)
 
@@ -104,10 +117,11 @@ class UtilTokenizer:
                     for i, each_word in enumerate(each_sentence):
                         try:
                             if i < seq_len:
-                                print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
+                                # print('word: {}\tvec: {}'.format(each_word, model.wv[each_word][0]))  # for debug.
                                 one_sentence_seq_vec[i, :] = model.wv[each_word]
                         except:
-                            print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(each_word))
+                            print('[natural_language][sentencepiece_tokenize] Does not exist sub-word: {}'.format(
+                                each_word))
                             continue
                     sentence_vectors.append(one_sentence_seq_vec)
 
@@ -150,6 +164,7 @@ class UtilTokenizer:
         # 文章を単語に分割する.
         wakachied_sentences = []
         for _sentence in sentences:
+            _sentence = self.u.clean(_sentence)
             wakachied_sentence = self.mecab.parse(_sentence).split('\n')[:-2]  # 分かち
 
             # 分かち書きした単語ごとの処理.
@@ -194,8 +209,8 @@ class UtilTokenizer:
                     for i, each_word in enumerate(each_sentence[::-1]):
                         try:
                             if i < seq_len:
-                                print('word: {}\tvec: {}'.format(each_word, self.w2v_model.wv[each_word][0]))  # for debug.
-                                one_sentence_seq_vec[-i-1, :] = self.w2v_model.wv[each_word]
+                                # print('word: {}\tvec: {}'.format(each_word, self.w2v_model.wv[each_word][0]))  # for debug.
+                                one_sentence_seq_vec[-i - 1, :] = self.w2v_model.wv[each_word]
                         except:
                             print('[natural_language][w2v_tokenize] Does not exist word: {}'.format(each_word))
                             continue
@@ -248,9 +263,10 @@ class UtilAugmentation:
     Strong Classifiers with Localizable Features
     https://arxiv.org/abs/1905.04899
     """
+
     def __init__(self,
                  model_path: str = 'models/pretrained/word2vec/jawiki.all_vectors.100d.bin',
-                 wordnet_path: str = 'models/nlp/wordnet/wnjpn.db'
+                 wordnet_path: str = 'models/nlp/wordnet/wnjpn.db',
                  ):
         from gensim.models import KeyedVectors
         self.w2v_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
@@ -290,9 +306,11 @@ class UtilAugmentation:
         if len(synonym_list) == 0:
             return _word
         else:
-            return synonym_list[int(random.uniform(0, len(synonym_list)-1))]
+            return synonym_list[int(random.uniform(0, len(synonym_list) - 1))]
 
-    def wakachi(self, _sentence):
+    def wakachi(self,
+                _sentence,
+                ):
         return self.mecab.parse(_sentence).split('\n')[:-2]
 
     def synonym_replacement(self,
@@ -312,7 +330,7 @@ class UtilAugmentation:
         :param _replacement_prob: 置換対象の単語を置換する確率.
         :param _replacement_hinshi: 置換対象の単語の品詞.
         :param _return_with_wakachi: 分かち書きされた形式で返すかどうか.
-        :param _num_of_augment: 1文書を水増しする試行数.
+        :param _num_of_argment: 1文書を水増しする試行数.
         :param _label: 水増しするデータの正解ラベルがあるならここで指定すれば、一緒に水増しする.
         :return:
         """
@@ -336,7 +354,8 @@ class UtilAugmentation:
                 for idx, each_word in enumerate(words):
 
                     # 置換対象の単語
-                    if each_word.split('\t')[3].split('-')[0] in _replacement_hinshi and random.random() <= _replacement_prob:  # 置換の判定
+                    if each_word.split('\t')[3].split('-')[0] in _replacement_hinshi and \
+                            random.random() <= _replacement_prob:  # 置換の判定
 
                         # WordNet
                         if _replacement_type == 'wordnet':
@@ -380,12 +399,16 @@ class UtilAugmentation:
 
 
 class NaturalLang:
-    def __init__(self, num_to_exec_multithread: int = 3):
+    def __init__(self,
+                 num_to_exec_multithread: int = 3,
+                 ):
         self.num_to_exec_multithread = num_to_exec_multithread
         self.wakachi_result_for_multiprocess = {}
         pass
 
-    def do_wakachi(self, args: list):
+    def do_wakachi(self,
+                   args: list,
+                   ):
         """
         分かち書きの処理を行う機能(multi_threadとして呼び出される側の関数)
 
@@ -404,9 +427,10 @@ class NaturalLang:
             print('[Warn][wakachi_mecab] 列「' + _col + '」が見つかりません。')
             return None
         # 文字列の統一
+        u = UtilNAL()
         for g in range(len(each_item)):
-            each_item[g] = jaconv.h2z(str(each_item[g]), kana=False, ascii=False)
-            each_item[g] = each_item[g].replace('(', '（').replace(')', '）')
+            each_item[g] = u.clean(str(each_item[g]))
+            # each_item[g] = each_item[g].replace('(', '（').replace(')', '）')
         # MeCabで分かち書き
         # In Ochasen
         # \t 区切り
@@ -440,7 +464,7 @@ class NaturalLang:
                         except IndexError:
                             word_dict[gc][wc]['hinshi'].append('')
                     # 単語の登録 for Ochasen
-                    word_dict[gc][wc]['word'] = w.split('\t')[0]
+                    word_dict[gc][wc]['word'] = w.split('\t')[2]  # 原型で登録
                     word_cnt += 1
                 # 'EOS'対策
                 except:
@@ -450,9 +474,11 @@ class NaturalLang:
 
     def wakachi_mecab(self,
                       _df: pd.DataFrame,
-                      _col: str, _export_result_wakachi: bool = False,
-                      _export_file_path: str='./export_result_wakachi.csv',
-                      _option: str = None):
+                      _col: str,
+                      _export_result_wakachi: bool = False,
+                      _export_file_path: str = './export_result_wakachi.csv',
+                      _option: str = None,
+                      ):
         """
         :param _df: excelデータをDataFrameへ変換したもの。
         :param _col: _df内の、分かち書きをしたい列名
@@ -474,9 +500,10 @@ class NaturalLang:
             args = []
             for i in range(num_of_thread):
                 if i == num_of_thread - 1:
-                    args.append([i, _option, q * i + 1, _df.iloc[q*i:q*(i + 1)+mod, :].reset_index(drop=True), _col])
+                    args.append(
+                        [i, _option, q * i + 1, _df.iloc[q * i:q * (i + 1) + mod, :].reset_index(drop=True), _col])
                 else:
-                    args.append([i, _option, q*i+1, _df.iloc[q*i:q*(i+1), :].reset_index(drop=True), _col])
+                    args.append([i, _option, q * i + 1, _df.iloc[q * i:q * (i + 1), :].reset_index(drop=True), _col])
             word_dicts = p.map(self.do_wakachi, args)
             p.close()
             for wd in word_dicts:
@@ -504,59 +531,67 @@ class NaturalLang:
             f.close()
         return word_dict
 
-    def create_histogram(self, _df: pd.DataFrame, _column: str, _typ: str, _ext_hinshi: list=['一般', '固有名詞'], _op = None):
-            """
-            ヒストグラムを作成する。
-            :param _df:
-            :param _column:
-            :param _typ: meishi, or all
-            :param _ext_hinshi:
-            :param _op: MeCab option if needed.
-            :return:
-            """
-            import collections
-            _word_box = []
-            count = 0
-            print('[Info] Start to import file.')
-            gaiyo = _df[_column].values  # type: np.ndarray
-            # 文字列の統一
-            for g in range(len(gaiyo)):
-                gaiyo[g] = jaconv.h2z(str(gaiyo[g]), kana=False, ascii=False)  # 半角→全角
-                gaiyo[g] = gaiyo[g].replace('(', '（').replace(')', '）')  # 半角カッコを全角に統一する
-            print('[Info] Start to create histogram.')
-            if _op is not None:
-                m = MeCab.Tagger(_op)
+    def create_histogram(self,
+                         _df: pd.DataFrame,
+                         _column: str,
+                         _typ: str,
+                         _ext_hinshi: list = ['一般', '固有名詞'],
+                         _op=None):
+        """
+        ヒストグラムを作成する。
+        :param _df:
+        :param _column:
+        :param _typ: meishi, or all
+        :param _ext_hinshi:
+        :param _op: MeCab option if needed.
+        :return:
+        """
+        import collections
+        _word_box = []
+        count = 0
+        print('[Info] Start to import file.')
+        gaiyo = _df[_column].values  # type: np.ndarray
+        # 文字列の統一
+        for g in range(len(gaiyo)):
+            gaiyo[g] = jaconv.h2z(str(gaiyo[g]), kana=False, ascii=False)  # 半角→全角
+            gaiyo[g] = gaiyo[g].replace('(', '（').replace(')', '）')  # 半角カッコを全角に統一する
+        print('[Info] Start to create histogram.')
+        if _op is not None:
+            m = MeCab.Tagger(_op)
+        else:
+            m = MeCab.Tagger()
+        for i in tqdm(gaiyo):
+            count += len(i.split(' '))
+            if _typ == 'meishi':
+                _word_info = i.split(' ')
+                for _each_word in _word_info:
+                    if _each_word == '': continue
+                    _w = m.parse(_each_word).split('\n')[0:-2]
+                    hinshi = _w[0].split('\t')[1]
+                    if hinshi.split(',')[0] == '名詞':
+                        type1 = hinshi.split(',')[1]
+                        if type1 in _ext_hinshi:
+                            _word_box.append(_w[0].split('\t')[0])
+            elif _typ == 'all':
+                _word_info = i.split(' ')  # MeCab default dic
+                _word_box.extend(_word_info)
             else:
-                m = MeCab.Tagger()
-            for i in tqdm(gaiyo):
-                count += len(i.split(' '))
-                if _typ == 'meishi':
-                    _word_info = i.split(' ')
-                    for _each_word in _word_info:
-                        if _each_word == '': continue
-                        _w = m.parse(_each_word).split('\n')[0:-2]
-                        hinshi = _w[0].split('\t')[1]
-                        if hinshi.split(',')[0] == '名詞':
-                            type1 = hinshi.split(',')[1]
-                            if type1 in _ext_hinshi:
-                                _word_box.append(_w[0].split('\t')[0])
-                elif _typ == 'all':
-                    _word_info = i.split(' ')  # MeCab default dic
-                    _word_box.extend(_word_info)
-                else:
-                    print('invalid type.')
+                print('invalid type.')
 
-            cnt = collections.Counter(_word_box)
-            # count words.
-            cnt_df = pd.DataFrame.from_dict(cnt, orient='index')  # convert Counter to DataFrame
-            cnt_df = cnt_df.rename(columns={0: 'count'})  # rename columns
-            cnt_df = cnt_df.sort_values('count', ascending=False)  # sort in descending order
-            f_brackets = lambda x: x / count
-            cnt_df_2 = cnt_df.iloc[:, 0].map(f_brackets)
-            output_df = pd.concat([cnt_df, cnt_df_2], axis=1)
-            return output_df
+        cnt = collections.Counter(_word_box)
+        # count words.
+        cnt_df = pd.DataFrame.from_dict(cnt, orient='index')  # convert Counter to DataFrame
+        cnt_df = cnt_df.rename(columns={0: 'count'})  # rename columns
+        cnt_df = cnt_df.sort_values('count', ascending=False)  # sort in descending order
+        f_brackets = lambda x: x / count
+        cnt_df_2 = cnt_df.iloc[:, 0].map(f_brackets)
+        output_df = pd.concat([cnt_df, cnt_df_2], axis=1)
+        return output_df
 
-    def tfidf(self, _corpus: list, _min_df: float = 0.03):
+    def tfidf(self,
+              _corpus: list,
+              _min_df: float = 0.03,
+              ):
         """
         TF-IDFによって、特徴語を抽出する機能.
         :param _corpus: インプットとなるコーパス（type: [ [I like vim] [I like python] ... ]）
@@ -584,7 +619,11 @@ class W2V:
         self.sentences = _sentences
         self.w2v_model = _model
 
-    def create_model(self, _size: int, _min_cnt: int, _window: int):
+    def create_model(self,
+                     _size: int,
+                     _min_cnt: int,
+                     _window: int,
+                     ):
         """
         create word2vec model.
         :param _size: 構築する単語ベクトルのサイズ
@@ -597,7 +636,11 @@ class W2V:
                                            window=_window,
                                            compute_loss=True)  # type: word2vec.Word2Vec
 
-    def train(self, _epoch: int, _alpha: float = 0.0001, _return_loss: bool = False):
+    def train(self,
+              _epoch: int,
+              _alpha: float = 0.0001,
+              _return_loss: bool = False,
+              ):
         """
         W2Vモデルを学習させる。
         :param _epoch: エポック数（ここではイテレーションの回数）
@@ -616,7 +659,10 @@ class W2V:
         if _return_loss:
             return loss
 
-    def save_model(self, _output_folder: str = './', _output_model_name: str = 'w2v_model.model'):
+    def save_model(self,
+                   _output_folder: str = './',
+                   _output_model_name: str = 'w2v_model.model',
+                   ):
         """
         作成したモデルを保存するメソッド
         :param _output_folder: 保存先フォルダパス
@@ -628,7 +674,10 @@ class W2V:
             return
         self.w2v_model.save(os.path.join(_output_folder, _output_model_name))
 
-    def search_sim_word(self, _word: str, topn: int = 20):
+    def search_sim_word(self,
+                        _word: str,
+                        topn: int = 20,
+                        ):
         """
         類似語を検索し、返す機能。
         :param _word:
@@ -642,11 +691,20 @@ class W2V:
 
 
 class D2V:
-    def __init__(self, _sentences, _model=None):
+    def __init__(self,
+                 _sentences,
+                 _model=None,
+                 ):
         self.d2v_model = _model
         self.sentences = [TaggedDocument(doc, [i]) for i, doc in enumerate(_sentences)]
 
-    def create_model(self, _dm: int=1, _size: int=300, _window: int=8, _min_count: int=10, _workers: int=4):
+    def create_model(self,
+                     _dm: int = 1,
+                     _size: int = 300,
+                     _window: int = 8,
+                     _min_count: int = 10,
+                     _workers: int = 4,
+                     ):
         """
         Doc2Vecのモデルを生成する機能
         :param _dm: training algorithm. 1 means 'distributed memory'. otherwise, 'distributed bag-of-words'
@@ -680,7 +738,7 @@ class D2V:
             self.d2v_model.train(self.sentences,
                                  total_examples=len(self.sentences),
                                  epochs=1)
-            self.d2v_model.alpha -= (0.025 - 0.0001)/_epoch
+            self.d2v_model.alpha -= (0.025 - 0.0001) / _epoch
 
     def save_model(self, _save_path):
         """
