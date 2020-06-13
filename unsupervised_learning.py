@@ -1,4 +1,4 @@
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, OPTICS
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_samples
@@ -108,10 +108,15 @@ class Dbscan:
     def __init__(self):
         pass
 
-    def train(self, _x, _eps: float = 0.2, _min_samples: int = 5, _concat: bool = False):
+    def train(self,
+              _x: np.ndarray,
+              _eps: float = 0.2,
+              _min_samples: int = 5,
+              _concat: bool = False,
+              ):
         """
         DBSCANのクラスタリングを行う機能
-        :param _x: 学習で使用するデータ
+        :param _x: 学習で使用するデータ. ndarray型.
         :param _eps: 隣接点とみなす2点間の最大距離
         :param _min_samples: ボーダー点の最小個数
         :param _concat: 学習データと分割データを結合して返すかどうか（default: False）
@@ -120,6 +125,30 @@ class Dbscan:
         db = DBSCAN(eps=_eps, min_samples=_min_samples, metric='euclidean')
         y_db = db.fit_predict(_x)
         if _concat:
-            return np.hstack([_x.values, y_db.reshape(len(y_db), 1)])
+            return np.hstack([_x, y_db.reshape(len(y_db), 1)])
         else:
             return y_db
+
+
+class Optics:
+    def __init__(self):
+        pass
+
+    def train(self,
+              _x: np.ndarray,
+              _min_samples: int = 5,
+              _concat: bool = False,
+              ):
+        """
+        OPTICSのクラスタリングを行う機能.
+        :param _x: 学習で使用するデータ. ndarray型.
+        :param _min_samples: クラスターの最小構成データ数.
+        :param _concat: 学習データとクラスタリング結果を結合して返すかどうか.
+        :return:
+        """
+        opt = OPTICS(min_samples=_min_samples)
+        y_opt = opt.fit(_x).labels_
+        if _concat:
+            return np.hstack([_x, y_opt.reshape(len(y_opt), 1)])  # reshape y_opt's shape (len(_x),) -> (len(_x), 1)
+        else:
+            return y_opt
