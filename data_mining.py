@@ -13,7 +13,11 @@ class DataManipulation:
     def __init__(self):
         self.p = plot.Plot()
 
-    def ica_reduction(self, _df: pd.DataFrame, _dim: int, _return_with_model=False):
+    def ica_reduction(self,
+                      _df: pd.DataFrame,
+                      _dim: int,
+                      _return_with_model=False,
+                      ):
         """
         独立成分分析でノイズを除去するもの。
         :param _df: 次元削減したいデータ(DataFrame形式)
@@ -31,7 +35,11 @@ class DataManipulation:
         else:
             return transformed
 
-    def pca_reduction(self, _df: pd.DataFrame, _dim: int, _return_with_model=False):
+    def pca_reduction(self,
+                      _df: pd.DataFrame,
+                      _dim: int,
+                      _return_with_model=False,
+                      ):
         """
         主成分分析で次元を削減するもの。
         :param _df: 次元削減したいデータ(DataFrame形式)
@@ -47,7 +55,13 @@ class DataManipulation:
         else:
             return transformed
 
-    def lda_reduction(self, _df: pd.DataFrame, _x: int, _y: int, _dim: int, _return_with_model=False):
+    def lda_reduction(self,
+                      _df: pd.DataFrame,
+                      _x: int,
+                      _y: int,
+                      _dim: int,
+                      _return_with_model=False,
+                      ):
         """
         LDAによる教師有データの次元削減を行う機能
         :param _df: 次元削減したいデータ(DataFrame形式)
@@ -65,8 +79,12 @@ class DataManipulation:
         else:
             return transformed
 
-    def tsne_reduction(self, _dim: int, _x, _return_with_model: bool):
-        """
+    def tsne_reduction(self,
+                       _dim: int,
+                       _x,
+                       _return_with_model: bool):
+        """,
+
         t-SNEによる次元削減を行う機能
         :param _dim: 削減後の次元数（t-SNEの場合、2or3次元）
         :param _x: 次元削減したいデータ（DataFrame形式）
@@ -74,7 +92,7 @@ class DataManipulation:
         :return:
         """
         if _dim > 3:
-            print('[Warn][tsne_reduction] It is to be desired that the dimention is 2 or 3.')
+            assert '[Warn][tsne_reduction] It is to be desired that the dimention is 2 or 3.'
         tsne = TSNE(n_components=_dim)
         transformed = tsne.fit_transform(_x)
         if _return_with_model:
@@ -82,7 +100,9 @@ class DataManipulation:
         else:
             return transformed
 
-    def simple_fft(self, _input_file: str):
+    def simple_fft(self,
+                   _input_file: str,
+                   ):
         """
         入力値を離散フーリエ変換し、周波数成分に分解する機能
         :param _input_file: 変換したいcsvファイル
@@ -102,7 +122,10 @@ class DataManipulation:
         plt.ylabel("Power")
         plt.show()
 
-    def fill_na(self, _df: pd.DataFrame, _typ: int):
+    def fill_na(self,
+                _df: pd.DataFrame,
+                _typ: int,
+                ):
         """
         fill na to all columns with previous value.
         :param _df: NAを埋めたいData Frame.
@@ -121,18 +144,12 @@ class DataManipulation:
         elif _typ == 1:
             return _df.interpolate()
 
-    def drop_na(self, _df: pd.DataFrame):
-        """
-        NAが含まれる行を削除するもの。
-        :param _df: NAが含まれる行を削除したいデータ(DataFrame形式)
-        :return: NAが削除された後のDataFrame
-        """
-        return _df.dropna(how='any')
-
-    def crosstabs(self, _df: pd.DataFrame, _x: int, _y: int, _val: int = None):
-        return pd.crosstab(_df.iloc[:, _x], _df.iloc[:, _y])
-
-    def moving_avg(self, _df: pd.DataFrame, _column: str, _typ: str = 'behind', _window: int = 3):
+    def moving_avg(self,
+                   _df: pd.DataFrame,
+                   _column: str,
+                   _typ: str = 'behind',
+                   _window: int = 3,
+                   ):
         """
         移動平均を算出し、列を追加して返す処理.
         :param _df:
@@ -152,10 +169,10 @@ class DataManipulation:
                 ave[-1 * margin:] = np.nan
                 ma_series = pd.Series(ave)
             else:
-                print('[Warn] Window size must be Odd number.')
+                assert '[Warn] Window size must be Odd number.'
                 return None
         else:
-            print('[Warn] _typ is invalid.')
+            assert '[Warn] _typ is invalid.'
             return None
         _df.reset_index(drop=True, inplace=True)
         concat_df = pd.concat([_df, pd.DataFrame(ma_series.T)], axis=1)
@@ -200,24 +217,28 @@ class FeatureSelection:
         if _drop:
             _df.drop(labels=feat_corr, axis='columns', inplace=True)
 
-        print('Feature variables reduced to ' + str(bef_var - len(feat_corr)) + ' from ' + str(bef_var) + '.')
+        assert f'Feature variables reduced to {bef_var - len(feat_corr)} from {bef_var}.'
         if _return_col:
             return _df, list(feat_corr)
         else:
             return _df
 
     @staticmethod
-    def lasso_based_feature_selection(_x, _t, _alpha: float=1.0, _iter: int=10000):
+    def lasso_based_feature_selection(_x,
+                                      _y,
+                                      _alpha: float=1.0,
+                                      _iter: int=10000,
+                                      ):
         """
         Lasso回帰(L1正則化)による次元削減.
         Σ(t_i - w^T * x_i)^2 + alpla * ||w||_1
         :param _x: 学習変数
-        :param _t: 目的変数
+        :param _y: 目的変数
         :param _alpha: 正則化パラメーター(λのこと). 0:正則化無し
         :param _iter:
         :return:
         """
         from sklearn.linear_model import Lasso
         lasso = Lasso(alpha=_alpha, normalize=True, max_iter=_iter)
-        lasso.fit(_x, _t)
+        lasso.fit(_x, _y)
         return lasso

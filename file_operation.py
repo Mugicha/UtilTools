@@ -1,5 +1,5 @@
-import pandas as pd
 import os
+import pandas as pd
 
 
 class FileOperation:
@@ -10,12 +10,12 @@ class FileOperation:
         :param _input_path: ファイルリストを取得したいフォルダパス
         :param _is_recursive: 指定したフォルダの中にサブフォルダがある場合、そこも検索するか(default:検索しない)
         :param _can_return_abspath: 戻り値のファイルパスは絶対パスにするか(default: _input_pathからの相対パス)
-        :return:
+        :return: list型オブジェクト.
         """
         # Exit if input path is file path.
         if os.path.isfile(_input_path):
-            print('[file_operation.py][get_file_list][Warn] Do not input file path.')
-            exit(1)
+            assert '[file_operation.py][get_file_list][Warn] Do not input file path.'
+            return []
         # 再帰的に検索
         if _is_recursive:
             fileList = []
@@ -68,7 +68,7 @@ class FileOperation:
         """
         ext = os.path.splitext(_path)[1]
         if not ext in ['.csv', '.tsv']:
-            print('[csv_to_df] Extension must be csv or tsv.')
+            assert '[csv_to_df] Extension must be csv or tsv.'
             return None
         sep = ',' if ext == '.csv' else '\t'
         if date_convert:
@@ -88,7 +88,7 @@ class FileOperation:
         :return:
         """
         if os.path.splitext(_output_file)[1] != '.csv':
-            print('[df_to_csv] Extension must be csv.')
+            assert '[df_to_csv] Extension must be csv.'
             return None
         _df.to_csv(os.path.join(_output_dir, _output_file), index=False, encoding=_encode)
 
@@ -101,8 +101,7 @@ class FileOperation:
         :return: Excelデータを格納したDataFrame(読み込めない場合はNone)
         """
         if not os.path.splitext(_input_path)[1] in ['.xlsx', '.xls']:
-            print('[file_operation.py][excel_to_df] Input file must be xlsx or xls.')
-            exit(1)
+            assert '[file_operation.py][excel_to_df] Input file must be xlsx or xls.'
         entire_row_data = pd.ExcelFile(_input_path)
         sheet_names = entire_row_data.sheet_names
         if len(sheet_names) == 1:  # シートが1つの時
@@ -118,9 +117,13 @@ class FileOperation:
         return row_data
 
     @staticmethod
-    def df_to_excel(_df: pd.DataFrame, _output_dir: str = './',
-                    _output_file: str = 'output.xlsx', _sheet_name='exported',
-                    _encoding: str = 'utf8', _index: bool=False):
+    def df_to_excel(_df: pd.DataFrame,
+                    _output_dir: str = './',
+                    _output_file: str = 'output.xlsx',
+                    _sheet_name='exported',
+                    _encoding: str = 'utf8',
+                    _index: bool = False,
+                    ):
         """
         Excelの書き出し
         :param _output_dir:
@@ -132,12 +135,19 @@ class FileOperation:
         :return: always None
         """
         if os.path.splitext(_output_file)[1] != '.xlsx':
-            print('[df_to_excel] Extension must be xlsx.')
+            assert '[df_to_excel] Extension must be xlsx.'
             return None
-        _df.to_excel(os.path.join(_output_dir, _output_file), sheet_name=_sheet_name, index=_index, encoding=_encoding)
+        _df.to_excel(os.path.join(_output_dir, _output_file),
+                     sheet_name=_sheet_name,
+                     index=_index,
+                     encoding=_encoding,
+                     )
 
     @staticmethod
-    def multiple_df_to_excel(_output_dir: str, _output_file: str, _output_df_list: list or dict):
+    def multiple_df_to_excel(_output_dir: str,
+                             _output_file: str,
+                             _output_df_list: list or dict,
+                             ):
         """
         DataframeをExcelの複数シートに保存する機能。
         :param _output_dir: 保存先のディレクトリパス
@@ -157,7 +167,9 @@ class FileOperation:
                     writer.save()
 
     @staticmethod
-    def txt_to_ary(_path: str, _encoding: str = 'utf8'):
+    def txt_to_ary(_path: str,
+                   _encoding: str = 'utf8',
+                   ):
         """
         対象のファイルを1行ごとに配列に格納してreturnする。
         改行は配列に入れる際に削除される。
@@ -175,7 +187,8 @@ class FileOperation:
     def ary_to_txt_1D(_list: list,
                       _output_file: str,
                       _mode: str,
-                      _encoding: str = 'utf8'):
+                      _encoding: str = 'utf8',
+                      ):
         """
         list型変数を要素ごとにテキストに書き出す。
         :param _list: 書き出したい配列LIST
@@ -190,7 +203,11 @@ class FileOperation:
         f.close()
 
     @staticmethod
-    def ary_to_txt_2D(_list: list, _output_file: str, _mode: str, _encoding: str = 'utf8'):
+    def ary_to_txt_2D(_list: list,
+                      _output_file: str,
+                      _mode: str,
+                      _encoding: str = 'utf8',
+                      ):
         """
 
         :param _list: 書き出したい配列LIST（2次元)
@@ -200,7 +217,7 @@ class FileOperation:
         :return:
         """
         if len([len(v) for v in _list]) >= 3:  # return error if the size is more than 3d.
-            print("[ary_to_txt_2D]: Can not export the list. Your list size is " + str([len(v) for v in _list]))
+            assert f"[ary_to_txt_2D]: Can not export the list. Your list size is {[len(v) for v in _list]}"
             return None
         with open(_output_file, _mode, encoding=_encoding) as f:
             for l in _list:
@@ -209,7 +226,11 @@ class FileOperation:
         f.close()
 
     @staticmethod
-    def dic_to_csv(_dic: dict, _output_file: str, _mode: str, _encoding: str = 'utf8'):
+    def dic_to_csv(_dic: dict,
+                   _output_file: str,
+                   _mode: str,
+                   _encoding: str = 'utf8',
+                   ):
         """
         辞書型配列のkeyとvalueを2列のcsvにして書き出す機能。
         :param _dic: 書き出したい辞書型配列
@@ -219,10 +240,10 @@ class FileOperation:
         :return:
         """
         if str(type(_dic)) != "<class 'dict'>":
-            print("[dic_to_txt]: Set _dic as dict type.")
+            assert "[dic_to_txt]: Set _dic as dict type."
             return None
         if _output_file.split('.')[-1] != 'csv':
-            print("[dic_to_txt]: Set _output_file as csv file.")
+            assert "[dic_to_txt]: Set _output_file as csv file."
             return None
         with open(_output_file, _mode, encoding=_encoding) as f:
             for key in _dic.keys():
@@ -237,7 +258,7 @@ class FileOperation:
         :return:
         """
         if os.path.splitext(_input_excel_file_path)[1] != '.xlsx':
-            print('[df_to_excel] Extension must be xlsx.')
+            assert '[df_to_excel] Extension must be xlsx.'
             return None
         df = self.excel_to_df(_input_excel_file_path)
         dic = {}

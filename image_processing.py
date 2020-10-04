@@ -1,16 +1,17 @@
-from tqdm import tqdm
-from skimage import morphology, io
 import cv2
 import os
 import numpy as np
-import UtilTools.common
+from skimage import morphology, io
+from tqdm import tqdm
+from . import common
 
 
 class Image_processing:
     def __init__(self):
-        self.c = UtilTools.common.Common()
+        self.c = common.Common()
 
-    def smooth_histogram(self, _path: str):
+    @staticmethod
+    def smooth_histogram(_path: str):
         """
         ヒストグラム平滑化する機能。
         :param _path: 平滑化する画像のパス。
@@ -45,14 +46,16 @@ class Image_processing:
         for h in tqdm(range(img.shape[0])):
             for w in range(img.shape[1]):
                 img_gamma[h][w] = m * pow(img[h][w] / m, 1 / _gamma)
-        # res = np.hstack((img, img_gamma))
-        # cv2.imshow('corrected.', res)
-        # cv2.waitKey(0)
         output_img = ''.join(_path.split('/')[-1].split('.')[0:-1]) + '_' + str(_gamma) + '.png'
-        if self.c.folder_check(_outpath):
+        if not os.path.exists(_outpath):
             cv2.imwrite(os.path.join(_outpath, output_img), img_gamma)
 
-    def extract_imgs(self, _h: int, _w: int, _path: str, _outpath='./'):
+    @staticmethod
+    def extract_imgs(_h: int,
+                     _w: int,
+                     _path: str,
+                     _outpath='./',
+                     ):
         """
         画像を定形に細切れにする機能。
         :param _h: 細切れにする高さ。
@@ -63,16 +66,21 @@ class Image_processing:
         """
         img = cv2.imread(_path, 0)
         if img.shape[0] % _h != 0 or img.shape[1] % _w != 0:
-            print('[Warn] Image cannot be divided by _w, or _h.')
-            exit(1)
-        if not self.c.folder_check(_outpath):
-            exit(1)
+            assert f'[Warn] Image cannot be divided by _w:{_w}, or _h:{_h}.'
+        if not os.path.exists(_outpath):
+            assert f'[Warn] output folder {_outpath} does not exist.'
         for ew in range(0, len(img[1]), _w):
             for eh in range(0, len(img[0]), _h):
                 extracted_patch = img[eh:eh + _h - 1, ew:ew + _w - 1]
                 cv2.imwrite(os.path.join(_outpath, _path.split('/')[-1].split('.')[0] + '_extpatch_h' + str(eh) + '_w' + str(ew) + '.png'), extracted_patch)
 
-    def extract_img(self, _s: list, _h: int, _w: int, _path: str, _outpath='./'):
+    @staticmethod
+    def extract_img(_s: list,
+                    _h: int,
+                    _w: int,
+                    _path: str,
+                    _outpath='./',
+                    ):
         """
         画像から単一の画像を切り取る処理
         :param _s: 切り取る開始位置（リスト型変数で、[x,y]）
@@ -83,14 +91,19 @@ class Image_processing:
         :return:
         """
         if len(_s) != 2:
-            print('_s must be list as [x, y].')
-            exit(1)
+            assert f'_s must be list as [x, y]. Your _s is {_s}'
         img = cv2.imread(_path, 0)
         ext_img = img[_s[0]:_s[0] + _h, _s[1]:_s[1] + _w]
-        if self.c.folder_check(_outpath):
+        if not os.path.exists(_outpath):
             cv2.imwrite(os.path.join(_outpath, _path.split('/')[-1].split('.')[0] + '_ext_h' + str(_h) + '_w' + str(_w) + '.png'), ext_img)
 
-    def extract_random_img(self, _num: int, _h: int, _w: int, _path: str, _outpath='./'):
+    @staticmethod
+    def extract_random_img(_num: int,
+                           _h: int,
+                           _w: int,
+                           _path: str,
+                           _outpath='./',
+                           ):
         """
         特定の画像から、決まったサイズの画像をランダムに切り取る処理
         :param _num: 切り取る画像の数
@@ -106,10 +119,13 @@ class Image_processing:
             width = random.randint(0, len(img[0, :]) - _w)
             height = random.randint(0, len(img[:, 0]) - _h)
             ext_img = img[height:height + _h, width:width + _w]
-            if self.c.folder_check(_outpath):
+            if not os.path.exists(_outpath):
                 cv2.imwrite(os.path.join(_outpath, str(count) + '.png'), ext_img)
 
-    def erosion(self, _img: np.array, _kernel_size: int):
+    @staticmethod
+    def erosion(_img: np.array,
+                _kernel_size: int,
+                ):
         """
         入力画像を収縮する処理
         :param _img:収縮させる画像(ndarray)
@@ -119,7 +135,10 @@ class Image_processing:
         kernel = np.ones((_kernel_size, _kernel_size), np.uint8)
         return cv2.erode(_img, kernel, iterations=1)
 
-    def dilation(self, _img: np.ndarray, _kernel_size: int):
+    @staticmethod
+    def dilation(_img: np.ndarray,
+                 _kernel_size: int,
+                 ):
         """
         入力画像を膨張させる処理
         :param _img:
@@ -129,7 +148,10 @@ class Image_processing:
         kernel = np.ones((_kernel_size, _kernel_size), np.uint8)
         return cv2.dilate(_img, kernel, iterations=1)
 
-    def opening(self, _img: np.ndarray, _kernel_size: int):
+    @staticmethod
+    def opening(_img: np.ndarray,
+                _kernel_size: int,
+                ):
         """
         入力画像をオープニング（収縮→膨張）する処理。
         ホワイトノイズを消すのに強い。
@@ -140,7 +162,10 @@ class Image_processing:
         kernel = np.ones((_kernel_size, _kernel_size), np.uint8)
         return cv2.morphologyEx(_img, cv2.MORPH_OPEN, kernel)
 
-    def closing(self, _img: np.ndarray, _kernel_size: int):
+    @staticmethod
+    def closing(_img: np.ndarray,
+                _kernel_size: int,
+                ):
         """
         入力画像をクロージング（膨張→収縮）する処理。
         オブジェクト内にあるノイズを消すのに強い。
@@ -154,7 +179,8 @@ class Image_processing:
     def ma_filter(self):
         pass
 
-    def skeltonize(self, _img: np.ndarray):
+    @staticmethod
+    def skeltonize(_img: np.ndarray):
         """
         細線化する処理
         :param _img: 細線化したい画像ファイル

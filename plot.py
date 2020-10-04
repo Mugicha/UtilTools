@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -19,6 +18,7 @@ class Plot:
                      _output_file_name='pure_2d_plot.png'):
         """
         DataFrame内の2列を使って二次元プロットを行う機能。
+
         :param _df: 使用するDataFrame
         :param _x: x軸のラベル番号
         :param _y: y軸のラベル番号
@@ -38,7 +38,6 @@ class Plot:
             plt.legend()
         plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
-        # return plt
 
     @staticmethod
     def pure_2d_scatter(_df: pd.DataFrame,
@@ -67,17 +66,22 @@ class Plot:
         plt.xticks(rotation=90)
         plt.tight_layout()
         plt.scatter(_df.iloc[:, _x].values, _df.iloc[:, _y].values, s=_s)
-        if c.folder_check(_output_folder_path):
+        if os.path.exists(_output_folder_path):
             plt.savefig(c.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
-        # return plt
 
     @staticmethod
-    def simple_histogram(x: list, color: list, xlabel: str = 'xlabel',
+    def simple_histogram(x: list,
+                         color: list,
+                         xlabel: str = 'xlabel',
                          _output_file_name: str = 'histogram.png',
-                         bins: int = 10, label: list = None, hist_type: str = 'side-by-side'):
+                         bins: int = 10,
+                         label: list = None,
+                         hist_type: str = 'side-by-side',
+                         ):
         """
         ヒストグラムを作成する機能。グラフはbins毎に各ラベル纏めてプロットする。
+
         :param x: ヒストグラムを作成したいデータ。複数ラベル分作成したい場合は、list型にまとめること。
         :param color: グラフの色。複数ラベルある場合は、複数ラベル分纏めてlist型で指定すること。
         :param xlabel: x軸の名称（default: xlabel）
@@ -90,8 +94,7 @@ class Plot:
         if len(x) == 0: return
         if len(color) == 0: return
         if len(x) != len(color):
-            print('[simplt_histogram] the size of each list x, colo must be same.')
-            return
+            assert '[simple_histogram] the size of each list x, colo must be same.'
         plt.ylabel('count')
         plt.xlabel(xlabel)
         stacked = False if hist_type == 'side-by-side' else True
@@ -99,7 +102,7 @@ class Plot:
             plt.hist(x, color=color, bins=bins, stacked=stacked)
         else:
             if len(x) != len(label):
-                print('[simple_histogram] the size of each list x, label must be same.')
+                assert '[simple_histogram] the size of each list x, label must be same.'
                 return
             plt.hist(x, color=color, bins=bins, label=label, stacked=stacked)
             plt.legend()
@@ -133,12 +136,14 @@ class Plot:
 
     @staticmethod
     def scatter_with_histogram(_df: pd.DataFrame,
-                               dim_reduction: bool=False,
-                               _figsize: tuple=(16, 12),
-                               _output_folder_path: str='./',
-                               _output_file_name: str='scatter_with_histogram.png'):
+                               dim_reduction: bool = False,
+                               _figsize: tuple = (16, 12),
+                               _output_folder_path: str = './',
+                               _output_file_name: str = 'scatter_with_histogram.png',
+                               ):
         """
         ヒストグラム付き散布図の画像を保存する機能。
+
         :param _df: 散布図の基となるDataFrame.
         :param dim_reduction: 次元削減するかどうか(default=False)
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12)
@@ -162,11 +167,12 @@ class Plot:
 
     @staticmethod
     def pair_plot(_df: pd.DataFrame,
-                  _figsize: tuple=(16, 12),
-                  _output_folder_path: str='./',
-                  _output_file_name: str='pair_plot.png'):
+                  _figsize: tuple = (16, 12),
+                  _output_folder_path: str = './',
+                  _output_file_name: str = 'pair_plot.png'):
         """
         seabornのPariplot画像を保存する機能。
+
         :param _df: pairplotしたいDataFrame
         :param _figsize: 保存する画像のサイズ（デフォルト：(16, 12))
         :param _output_folder_path: 保存するフォルダのパス
@@ -186,11 +192,12 @@ class Plot:
                          _y: int,
                          _c: int,
                          _labeldict: dict,
-                         _color_box: list=None,
-                         _figsize: tuple=(16, 12),
-                         _output_folder_path: str='./',
-                         _output_file_name: str='scatter_emphasis.png',
-                         _s: int=2):
+                         _color_box: list = None,
+                         _figsize: tuple = (16, 12),
+                         _output_folder_path: str = './',
+                         _output_file_name: str = 'scatter_emphasis.png',
+                         _s: int = 2,
+                         ):
         """
         ラベルによって色を変えて散布図を表示する機能。
         :param _df: 表示させたいDataFrame
@@ -237,11 +244,12 @@ class Plot:
                  _x: str,
                  _y: str,
                  _z: str,
-                 _figsize: tuple=(16, 12),
-                 _output_folder_path: str='./',
-                 _output_file_name: str='pcolormesh.png'):
+                 _figsize: tuple = (16, 12),
+                 _output_folder_path: str = './',
+                 _output_file_name: str = 'pcolormesh.png'):
         """
         二次元カラーマップを作製する機能
+
         :param _df: プロットの基となるDataFrame
         :param _x: x軸としたい項目名
         :param _y: y軸としたい項目名
@@ -270,12 +278,13 @@ class Plot:
     @staticmethod
     def show_correlogram(_df: pd.DataFrame,
                          _col: int,
-                         _lag: int=10,
-                         _figsize: tuple=(16, 12),
-                         _output_folder_path: str='./',
-                         _output_file_name: str='correlogram.png'):
+                         _lag: int = 10,
+                         _figsize: tuple = (16, 12),
+                         _output_folder_path: str = './',
+                         _output_file_name: str = 'correlogram.png'):
         """
         コレログラムのグラフを画像として保存する機能。欠損値を補完しておく必要がある。
+
         :param _df: 対象のデータフレーム
         :param _col: コレログラムでプロットしたいデータフレームの列名
         :param _lag: コレログラムで表示するラグ(デフォルト値: 10）
@@ -292,22 +301,6 @@ class Plot:
         plt.tight_layout()
         plt.savefig(common.Common.file_exist_check(os.path.join(_output_folder_path, _output_file_name)))
         plt.close()
-
-    def plot_all_combination(self, _df: pd.DataFrame, _cols: list, _x: int, _y: int):
-        """
-        DataFrameの中にあるキー情報の全組合せにてグラフをプロットする機能。
-        :param _df: 対象のDataFrame
-        :param _cols: キー情報としたい列名（column名で）
-        :param _x: プロットするときのx軸（番号）
-        :param _y: プロットするときのy軸（番号）
-        :return:
-        """
-        from . import common
-        c = common.Common()
-        combination = c.extract_all_combination(_df, _cols)
-        for each_combination in combination:
-            _df_extracted = _df[_df[_cols[0] == each_combination[0]] & _df[_cols[1] == each_combination[1]]]
-            self.pure_2d_scatter(_df=_df_extracted, _x=0, _y=1)
 
     def simple_fft(self, _series: pd.Series,
                    _output_file_name: str,

@@ -1,5 +1,4 @@
 import pathlib
-import glob
 import MeCab
 
 
@@ -7,11 +6,12 @@ class ImportData:
     def __init__(self):
         pass
 
-    def import_livedoor(self, _path: str):
+    @staticmethod
+    def import_livedoor(_path: str):
         """
         Livedoor newsデータを読み込む処理.
         :param _path:
-        :return: [['今日', 'は', '熱い'], ['今日', 'は', '眠い'], ['今日', 'は', '寒い'], ]
+        :return: [['今日', 'は', '熱い'], ['今日', 'は', '眠い'], ['今日', 'は', '寒い'], ...]
         """
         pth = pathlib.Path(_path)
         label = []

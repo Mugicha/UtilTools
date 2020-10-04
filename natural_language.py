@@ -17,7 +17,8 @@ class UtilNAL:
     def __init__(self):
         pass
 
-    def clean(self, sentence):
+    @staticmethod
+    def clean(sentence):
         sentence = jaconv.h2z(str(sentence), kana=True, ascii=True)
         return sentence
 
@@ -759,18 +760,3 @@ class D2V:
             print('[D2V] model is None.')
             return None
         return self.d2v_model.similarity(word1, word2)
-
-
-if __name__ == '__main__':
-    # tokenizer = UtilTokenizer()
-    # ret = tokenizer.w2v_tokenize(sentences=['今日は寝過ごした。', '昼寝は無いだろう。'],
-    #                              typ='seq',
-    #                              seq_padding_typ=2,
-    #                              seq_len=5)
-    aug = UtilAugmentation()
-    ret = aug.synonym_replacement(['カスタムカー＆キャンギャルの祭典が開催！【東京オートサロン 2011】'],
-                                  _replacement_prob=1,
-                                  _replacement_hinshi=['動詞', '名詞', '形容詞'],
-                                  _return_with_wakachi=False,
-                                  )
-    print(ret)
